@@ -9,6 +9,8 @@ Building Cloak
 --------------
 Cloak is written in C++ and I have provided makefiles for Unix/Linux (makefile.nix) using the g++ (gcc) compiler (tested on Ubuntu 16.04) and for Windows (makefile.vcwin32) using Visual Studio C++ (I used VS 2015 Community Edition, tested on Windows 10). Cloak depends on the 3rd party libraries libpng, zlib (both for PNG read/write functionality) and libbsd for Linux (to provide strlcpy/strlcat library functions). I have provided the pre-built libraries libpng.lib and zlib.lib for Windows, x86 32-bit, for some reason I haven't figured out yet, I couldn't get libpng to compile under the 64-bit compiler.
 
+Using Cloak
+-----------
 Cloak has two modes of operation, command line (driven by command line parameters) and interactive mode (you enter commands at the cloak> prompt). Type Cloak -? to get help on the command line parameters, if you just type Cloak [enter] you will enter interactive mode and can type the 'help' command for a list of available commands.
 
 I have included a sample PNG file with this distribution - flowers.png which has PDF document encoded within it, the password used to encrypt the file is 'password', I strongly suggest you use much stronger passwords :)
