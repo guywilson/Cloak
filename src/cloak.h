@@ -24,6 +24,9 @@ class Cloak
 		void				_merge(byte * pTargetBytes);
 		void				_extract();
 		
+		void				_populateSizeBuffer(dword size, byte *pBuffer);
+		dword				_getSizeFromBuffer(byte *pBuffer);
+		
 	public:
 							Cloak();
 							~Cloak();

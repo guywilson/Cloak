@@ -168,6 +168,52 @@ void Cloak::copy(char *pszFilename)
 	targetImage->write();
 }
 
+/*
+** Encode the file size by XORing with the image size. An attempt
+** to disguise the size of the hidden file rather than encoding it
+** as-is in the image.
+*/
+void Cloak::_populateSizeBuffer(dword size, byte *pBuffer)
+{
+	int		i;
+	dword	imageSize;
+	byte	imageSizeBuffer[4];
+	
+	imageSize = sourceImage->getImageDataLength();
+	
+	memcpy(pBuffer, &size, 4);
+	memcpy(imageSizeBuffer, &imageSize, 4);
+	
+	for (i = 0;i < 4;i++) {
+		pBuffer[i] = pBuffer[i] ^ imageSizeBuffer[i];
+	}
+}
+
+/*
+** Extract the file size by XORing with the image size. An attempt
+** to disguise the size of the hidden file rather than encoding it
+** as-is in the image.
+*/
+dword Cloak::_getSizeFromBuffer(byte *pBuffer)
+{
+	int		i;
+	dword	imageSize;
+	dword	ulSize;
+	byte	imageSizeBuffer[4];
+	
+	imageSize = sourceImage->getImageDataLength();
+	
+	memcpy(imageSizeBuffer, &imageSize, 4);
+	
+	for (i = 0;i < 4;i++) {
+		pBuffer[i] = pBuffer[i] ^ imageSizeBuffer[i];
+	}
+
+	memcpy(&ulSize, pBuffer, 4);
+	
+	return ulSize;
+}
+
 void Cloak::_merge(byte * pTargetBytes)
 {
 	byte		dataBits;
@@ -185,7 +231,7 @@ void Cloak::_merge(byte * pTargetBytes)
 
 	ulFileLength = sourceFile->getFileLength();
 	
-	memcpy(chSizeBuffer, &ulFileLength, 4);
+	_populateSizeBuffer(ulFileLength, chSizeBuffer);
 	
 	BitStreamIterator sizeIterator(chSizeBuffer, 4, 1);
 	
@@ -269,7 +315,7 @@ void Cloak::_extract()
 				chSizeBuffer[pos++] = chSecretByte;
 
 				if (pos == 4L) {
-					memcpy_d(&ulSecretBytes, chSizeBuffer, 4, "Cloak._extract():chSizeBuffer->ulSecretBytes");
+					ulSecretBytes = _getSizeFromBuffer(chSizeBuffer);
 
 					if (ulSecretBytes > getImageCapacity()) {
 						throw new Exception(ERR_NO_HIDDEN_FILE, "Bitmap does not seem to contain a valid hidden file", __FILE__, "Cloak", "extract()", __LINE__);
