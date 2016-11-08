@@ -1,5 +1,5 @@
 # Cloak
-Hide and extract an encrypted file within a RGB (24-bit) bitmap or PNG image. 
+Hide and extract an encrypted file within an RGB (24-bit) bitmap or PNG image. 
 
 The idea is simple, a 24-bit colour bitmap or PNG image uses 3 bytes for each pixel in the image, one each for Red, Green and Blue, so each colour channel is represented by a value between 0 - 255. If we encode data in the least significant bits (LSBs) of the image data, there will be no visible difference in ther image when displayed, at an encoding depth of 1-bit per byte, we need 8 bytes of image data to encode 1 byte of our file.
 
