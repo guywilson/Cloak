@@ -34,7 +34,7 @@ CPP=cl
 LINKER=link
 
 # Target Architecture
-MACHINE=/MACHINE:x86
+MACHINE=/MACHINE:x64
 
 # C++ compiler flags
 CFLAGS_REL=-c -W3 -Ot -Gs -nologo -I $(PNGH) -D_CRT_SECURE_NO_WARNINGS

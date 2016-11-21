@@ -57,7 +57,7 @@ class Cloak
 		
 		void				validate();
 		
-		char *				getTargetFileExtension();
+		const char *		getTargetFileExtension();
 };
 
 #endif

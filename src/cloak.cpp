@@ -44,15 +44,18 @@ Image *Cloak::getSourceImage()
 
 ImageType Cloak::_getImageType(char *pszFilename)
 {
-	int			i;
+	dword		i;
+	dword		fileNameLength;
 	int			j;
 	ImageType	type;
 	char		ch;
 	char		szExtension[4];
 	
+	fileNameLength = (dword)strlen(pszFilename);
+	
 	// Work backwords to pick out the file extension
 	// either .png or .bmp
-	for (i = strlen(pszFilename) - 1;i > 0;i--) {
+	for (i = fileNameLength - 1;i > 0;i--) {
 		ch = pszFilename[i];
 		
 		if (ch == '.') {
@@ -440,7 +443,7 @@ void Cloak::validate()
 	}
 }
 
-char *Cloak::getTargetFileExtension()
+const char *Cloak::getTargetFileExtension()
 {
 	return "*";
 }

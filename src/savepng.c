@@ -74,8 +74,8 @@ static int save_png_to_file (bitmap_t *bitmap, const char *path)
 
     png_set_IHDR (png_ptr,
                   info_ptr,
-                  bitmap->width,
-                  bitmap->height,
+                  (png_uint_32)bitmap->width,
+                  (png_uint_32)bitmap->height,
                   depth,
                   PNG_COLOR_TYPE_RGB,
                   PNG_INTERLACE_NONE,
@@ -90,7 +90,7 @@ static int save_png_to_file (bitmap_t *bitmap, const char *path)
             png_malloc (png_ptr, sizeof (uint8_t) * bitmap->width * pixel_size);
         row_pointers[y] = row;
         for (x = 0; x < bitmap->width; ++x) {
-            pixel_t * pixel = pixel_at (bitmap, x, y);
+            pixel_t * pixel = pixel_at (bitmap, (int)x, (int)y);
             *row++ = pixel->red;
             *row++ = pixel->green;
             *row++ = pixel->blue;
@@ -149,8 +149,8 @@ int main ()
     for (y = 0; y < fruit.height; y++) {
         for (x = 0; x < fruit.width; x++) {
             pixel_t * pixel = pixel_at (& fruit, x, y);
-            pixel->red = pix (x, fruit.width);
-            pixel->green = pix (y, fruit.height);
+            pixel->red = pix (x, (int)fruit.width);
+            pixel->green = pix (y, (int)fruit.height);
         }
     }
 

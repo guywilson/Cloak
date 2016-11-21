@@ -45,11 +45,11 @@ dword EncryptionAlgorithm::getEncryptedDataLength(dword ulDataLength)
 
 PBYTE EncryptionAlgorithm::generateKeyFromPassword(PSZ pszPassword, PBYTE key)
 {
-	int			i;
-	int			pwdLength;
+	dword		i;
+	dword		pwdLength;
 	byte		pwd[64];
 	
-	pwdLength = strlen(pszPassword);
+	pwdLength = (dword)strlen(pszPassword);
 	
 	/*
 	** Validate password length...

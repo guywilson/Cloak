@@ -199,6 +199,15 @@ dword Image::getCapacity(word bitsPerByte)
 	return ((getImageDataLength() / 8) * bitsPerByte) - 32;
 }
 
+void Image::read()
+{
+	throw new Exception(ERR_VALIDATION, "Attempt to call virtual function", __FILE__, "Image", "read()", __LINE__);
+}
+
+void Image::write()
+{
+	throw new Exception(ERR_VALIDATION, "Attempt to call virtual function", __FILE__, "Image", "write()", __LINE__);
+}
 
 PNG::PNG(char *pszFilename) : Image(pszFilename)
 {
@@ -222,10 +231,6 @@ PNG::PNG(Image *sourceImage) : Image(sourceImage, true)
 PNG::PNG() : Image()
 {
 	initialise();
-}
-
-PNG::~PNG()
-{
 }
  
  
@@ -342,11 +347,6 @@ Bitmap::Bitmap(Image *sourceImage) : Image(sourceImage, true)
 Bitmap::Bitmap() : Image()
 {
 	initialise();
-}
-
-Bitmap::~Bitmap()
-{
-	//
 }
 
  

@@ -89,8 +89,8 @@ class Image
 		
 		ByteStreamIterator	*	iterator();
 		
-		virtual void	read() = 0;
-		virtual void	write() = 0;
+		virtual void	read();
+		virtual void	write();
 };
 
 class PNG : public Image
@@ -109,8 +109,6 @@ class PNG : public Image
                         PNG(byte *pData);
 						PNG(Image *sourceImage);
                         PNG();
-                         
-                        ~PNG();
 
 		int				getCompressionLevel();
 		void			setCompressionLevel(int level);
@@ -152,8 +150,6 @@ class Bitmap : public Image
 						Bitmap(byte *pData);
 						Bitmap(Image *sourceImage);
 						Bitmap();
-						
-						~Bitmap();
 						
 		char		*	getMagicNumber();
 		void			setMagicNumber(char *pszValue);

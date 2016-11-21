@@ -67,11 +67,11 @@ dword DataFile::getFileLength()
 
 void DataFile::getExtension(char *pszExtension)
 {
-	int		i;
-	int		fileNameLength;
+	dword	i;
+	dword	fileNameLength;
 	char	ch;
 	
-	fileNameLength = strlen(szFilename);
+	fileNameLength = (dword)strlen(szFilename);
 	
 	for (i = (fileNameLength - 1);i > 0;i--) {
 		ch = szFilename[i];

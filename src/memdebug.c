@@ -6,7 +6,7 @@
 #include "memdebug.h"
 
 
-void * malloc_d(size_t size, char *pszId)
+void * malloc_d(size_t size, const char *pszId)
 {
 	void * rtn;
 	byte * p;
@@ -21,7 +21,7 @@ void * malloc_d(size_t size, char *pszId)
 	return p;
 }
 
-void free_d(void *ptr, char *pszId)
+void free_d(void *ptr, const char *pszId)
 {
 	byte * p;
 	
@@ -34,7 +34,7 @@ void free_d(void *ptr, char *pszId)
 	free(ptr);
 }
 
-void * memcpy_d(void * d, void * s, size_t size, char *pszId)
+void * memcpy_d(void * d, void * s, size_t size, const char *pszId)
 {
 	void * rtn;
 	byte * p;
@@ -52,7 +52,7 @@ void * memcpy_d(void * d, void * s, size_t size, char *pszId)
 	return rtn;
 }
 
-size_t fwrite_d(const void * ptr, size_t size, size_t count, FILE * stream, char *pszId)
+size_t fwrite_d(const void * ptr, size_t size, size_t count, FILE * stream, const char *pszId)
 {
 	size_t rtn;
 	byte * p;
@@ -68,7 +68,7 @@ size_t fwrite_d(const void * ptr, size_t size, size_t count, FILE * stream, char
 	return rtn;
 }
 
-size_t fread_d(void * ptr, size_t size, size_t count, FILE * stream, char *pszId)
+size_t fread_d(void * ptr, size_t size, size_t count, FILE * stream, const char *pszId)
 {
 	size_t rtn;
 	byte * p;
