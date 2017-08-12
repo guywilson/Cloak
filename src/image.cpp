@@ -27,11 +27,16 @@ Image::Image(Image *sourceImage, bool deep)
 	_copy(sourceImage, deep);
 }
 
-Image::~Image()
+void Image::cleanUp()
 {
 	if (pchData != NULL) {
 		free_d(pchData, "Image.~Image():pchData");
 	}
+}
+
+Image::~Image()
+{
+	cleanUp();
 }
 
 void Image::_copy(Image *sourceImage, bool deep)

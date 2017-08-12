@@ -53,6 +53,7 @@ class Image
 		long            lWidth;					// Width of the image
 		long            lHeight;				// Height of the image
 
+		void 			cleanUp();
 		void			setImageType(ImageType type);
 
 		virtual void	initialise() = 0;
@@ -65,7 +66,7 @@ class Image
 						Image(Image *sourceImage, bool deep);
 						Image() {}
 
-						~Image();
+		virtual			~Image();
 
 		ImageType		getImageType();
 

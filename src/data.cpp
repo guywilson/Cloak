@@ -70,12 +70,12 @@ void DataFile::getExtension(char *pszExtension)
 	dword	i;
 	dword	fileNameLength;
 	char	ch;
-	
+
 	fileNameLength = (dword)strlen(szFilename);
-	
+
 	for (i = (fileNameLength - 1);i > 0;i--) {
 		ch = szFilename[i];
-		
+
 		if (ch == '.') {
 		#ifdef _WIN32
 			strncpy_s(pszExtension, EXTENSION_BUFFER_LENGTH, &szFilename[i + 1], 4);
@@ -95,13 +95,13 @@ byte * DataFile::getData()
 void DataFile::read()
 {
 	FILE		*fptr;
-	
+
 	fptr = fopen(this->szFilename, "rb");
-	
+
 	if (fptr == NULL) {
 		throw new Exception(ERR_OPEN_DATA_FILE, "Failed to open data file", __FILE__, "DataFile", "read()", __LINE__);
 	}
-	
+
 	_getFileLength(fptr);
 
 	data = (byte *)malloc_d(ulFileLength, "DataFile.read():data");
@@ -117,22 +117,22 @@ void DataFile::read()
 	}
 
 	fread_d(data, 1, this->ulFileLength, fptr, "DataFile.read():data");
-	
+
 	fclose(fptr);
 }
 
 void DataFile::write()
 {
 	FILE		*fptr;
-	
+
 	fptr = fopen(this->szFilename, "wb");
-	
+
 	if (fptr == NULL) {
 		throw new Exception(ERR_OPEN_DATA_FILE, "Failed to open data file", __FILE__, "DataFile", "write()", __LINE__);
 	}
 
 	fwrite_d(data, 1, this->ulFileLength, fptr, "DataFile.write():data");
-	
+
 	fclose(fptr);
 }
 
@@ -164,9 +164,9 @@ dword EncryptedDataFile::getEncryptedDataLength()
 BitStreamIterator * EncryptedDataFile::iterator(word usBitsPerByte)
 {
 	BitStreamIterator *iterator;
-	
+
 	iterator = new BitStreamIterator(data, ulEncryptedDataLength, usBitsPerByte);
-	
+
 	return iterator;
 }
 
@@ -184,7 +184,7 @@ void EncryptedDataFile::encrypt(char *pszPassword)
 {
 	byte 	key[16];
 	byte	key2[16];
-	
+
 	/*
 	** Do not encrypt if no password supplied...
 	*/
@@ -194,10 +194,10 @@ void EncryptedDataFile::encrypt(char *pszPassword)
 
 		AES cipher(data, ulFileLength);
 		ulEncryptedDataLength = cipher.encrypt(key, data);
-		
+
 		AES cipher2(data, ulEncryptedDataLength);
 		cipher2.encrypt(key2, data);
-		
+
 		XOR cipher3(data, ulEncryptedDataLength);
 		cipher3.encrypt(XORkey, STATIC_KEY_LENGTH, data);
 	}
@@ -215,7 +215,7 @@ void EncryptedDataFile::decrypt(char *pszPassword)
 {
 	byte 	key[16];
 	byte	key2[16];
-	
+
 	/*
 	** Do not encrypt if no password supplied...
 	*/
@@ -245,13 +245,13 @@ void EncryptedDataFile::decrypt(byte * pbKey, dword ulKeyLength)
 void EncryptedDataFile::read()
 {
 	FILE		*fptr;
-	
+
 	fptr = fopen(this->szFilename, "rb");
-	
+
 	if (fptr == NULL) {
 		throw new Exception(ERR_OPEN_DATA_FILE, "Failed to open data file", __FILE__, "DataFile", "read()", __LINE__);
 	}
-	
+
 	_getFileLength(fptr);
 
 	data = (byte *)malloc_d(EncryptionAlgorithm::getEncryptedDataLength(this->ulFileLength), "EncryptedDataFile.read():data");
@@ -267,21 +267,21 @@ void EncryptedDataFile::read()
 	}
 
 	fread_d(data, 1, this->ulFileLength, fptr, "EncryptedDataFile.read():data");
-	
+
 	fclose(fptr);
 }
 
 void EncryptedDataFile::write()
 {
 	FILE		*fptr;
-	
+
 	fptr = fopen(this->szFilename, "wb");
-	
+
 	if (fptr == NULL) {
 		throw new Exception(ERR_OPEN_DATA_FILE, "Failed to open data file", __FILE__, "DataFile", "write()", __LINE__);
 	}
 
 	fwrite_d(data, 1, this->ulFileLength, fptr, "EncryptedDataFile.write():data");
-	
+
 	fclose(fptr);
 }

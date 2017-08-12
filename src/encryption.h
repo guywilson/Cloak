@@ -7,12 +7,14 @@
 #define BLOCK_SIZE			16
 #define KEY_LENGTH			16
 
+#define STATIC_KEY_LENGTH		1024
+
 class EncryptionAlgorithm
 {
 	private:
 		dword			numBlocks;
 		dword			blockCount;
-	
+
 	protected:
 		dword			ulDataLength;
 		dword			ulDataPtr;
@@ -20,17 +22,17 @@ class EncryptionAlgorithm
 
 		void			getNextDataBlock(PBYTE block);
 		bool			hasNextBlock();
-		
+
 	public:
 						EncryptionAlgorithm(PBYTE pInputData, dword ulDataLength);
 						~EncryptionAlgorithm();
-						
+
 		static PBYTE	generateKeyFromPassword(PSZ pszPassword, PBYTE key);
 		static void 	getSecondaryKey(PBYTE pInitialKey, PBYTE pSecondaryKey);
-		
+
 		dword			getEncryptedDataLength();
 		static dword	getEncryptedDataLength(dword ulDataLength);
-		
+
 		/*
 		** It is assumed that the key is 16 bytes (128 bit)
 		*/
@@ -43,7 +45,7 @@ class AES : public EncryptionAlgorithm
 {
 	public:
 						AES(PBYTE pInputData, dword ulDataLength);
-						
+
 		dword			encrypt(PBYTE pKey, PBYTE pOutputData);
 		dword			decrypt(PBYTE pKey, PBYTE pOutputData);
 };
@@ -53,7 +55,7 @@ class XOR : public EncryptionAlgorithm
 {
 	public:
 						XOR(PBYTE pInputData, dword ulDataLength);
-						
+
 		dword			encrypt(PBYTE pKey, PBYTE pOutputData);
 		dword			decrypt(PBYTE pKey, PBYTE pOutputData);
 
