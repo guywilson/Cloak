@@ -2,7 +2,7 @@
 #                                                                             #
 # MAKEFILE for Cloak application                                              #
 #                                                                             #
-# ï¿½ Guy Wilson 2012                                                           #
+# © Guy Wilson 2012                                                           #
 #                                                                             #
 # Build using Visual Studio C++                                               #
 # Use 'nmake' to build with this makefile, 'nmake -a' to rebuild all          #
@@ -19,14 +19,14 @@ BUILD=build
 TARGET=cloak
 
 # C++ compiler
-CPP=g++-7.1
-C=gcc-7.1
+CPP=g++
+C=gcc
 
 # Linker
-LINKER=g++-7.1
+LINKER=g++
 
 # C++ compiler flags
-CPPFLAGS=-c -fpermissive -Wall -std=c++11
+CPPFLAGS=-c -fpermissive -Wall
 CFLAGS=-c -Wall
 
 # Object files (in linker ',' seperated format)
@@ -48,10 +48,10 @@ $(BUILD)/iterator.o: $(SOURCE)/iterator.cpp $(SOURCE)/iterator.h $(SOURCE)/types
 
 $(BUILD)/image.o: $(SOURCE)/image.cpp $(SOURCE)/image.h $(SOURCE)/iterator.h $(SOURCE)/exception.h $(SOURCE)/errorcodes.h $(SOURCE)/types.h $(SOURCE)/pngreadwrite.h
 	$(CPP) $(CPPFLAGS) -o $(BUILD)/image.o $(SOURCE)/image.cpp
-
+	
 $(BUILD)/data.o: $(SOURCE)/data.cpp $(SOURCE)/data.h $(SOURCE)/iterator.h $(SOURCE)/encryption.h $(SOURCE)/exception.h $(SOURCE)/errorcodes.h $(SOURCE)/types.h
 	$(CPP) $(CPPFLAGS) -o $(BUILD)/data.o $(SOURCE)/data.cpp
-
+	
 $(BUILD)/encryption.o: $(SOURCE)/encryption.cpp $(SOURCE)/encryption.h $(SOURCE)/md5.h $(SOURCE)/exception.h $(SOURCE)/errorcodes.h $(SOURCE)/types.h $(SOURCE)/salt.h $(SOURCE)/key.h
 	$(CPP) $(CPPFLAGS) -o $(BUILD)/encryption.o $(SOURCE)/encryption.cpp
 
@@ -71,4 +71,4 @@ $(BUILD)/pngreadwrite.o: $(SOURCE)/pngreadwrite.c $(SOURCE)/pngreadwrite.h $(SOU
 	$(C) $(CFLAGS) -I/usr/local/include -o $(BUILD)/pngreadwrite.o $(SOURCE)/pngreadwrite.c
 
 $(TARGET): $(OBJFILES)
-	$(LINKER) -lstdc++ -o $(TARGET) $(OBJFILES) -lpng -lz
+	$(LINKER) -L/usr/local/lib -L/usr/lib/x86_64-linux-gnu -lstdc++ -o $(TARGET) $(OBJFILES) -lpng -lz -lbsd
