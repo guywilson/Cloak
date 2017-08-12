@@ -19,11 +19,11 @@ BUILD=build
 TARGET=cloak
 
 # C++ compiler
-CPP=g++-7.1
-C=gcc-7.1
+CPP=g++
+C=gcc
 
 # Linker
-LINKER=g++-7.1
+LINKER=g++
 
 # C++ compiler flags
 CPPFLAGS=-c -fpermissive -Wall -std=c++11
