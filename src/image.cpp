@@ -225,7 +225,7 @@ PNG::PNG(char *pszFilename) : Image(pszFilename)
 	initialise();
 }
 
-PNG::PNG(byte *pData) : Image(pchData)
+PNG::PNG(byte *pData) : Image(pData)
 {
 	initialise();
 }
@@ -311,7 +311,7 @@ Bitmap::Bitmap(char *pszFilename) : Image(pszFilename)
 	initialise();
 }
 
-Bitmap::Bitmap(byte *pData) : Image(pchData)
+Bitmap::Bitmap(byte *pData) : Image(pData)
 {
 	initialise();
 }
