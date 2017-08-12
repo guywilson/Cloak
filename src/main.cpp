@@ -9,13 +9,13 @@
 **
 ** Description: The idea here is simple, take a 24-bit RGB bitmap or PNG,
 **              encode within the image another file you wish to hide.
-**              By encoding the file in the LSB of the image bytes, 
-**				there will be no noticeable difference to the image itself, 
-**				as we are only (maybe) changing the least significant bit (LSB) 
+**              By encoding the file in the LSB of the image bytes,
+**				there will be no noticeable difference to the image itself,
+**				as we are only (maybe) changing the least significant bit (LSB)
 **              of each byte when encoding with 1-bit per byte. Encoding with
 **				4-bits per byte will introduce a noticeable 'grain' effect on some
 **				images.
-**              This is only effective for true colour bitmaps (24 bit) as other 
+**              This is only effective for true colour bitmaps (24 bit) as other
 **				bitmaps use a colour palette.
 **
 *******************************************************************************/
@@ -49,19 +49,19 @@ int _strcmpi(const char *pszStr, const char *pszCompare)
 {
 	int		i;
 	int		len;
-	
+
 	if (strlen(pszStr) != strlen(pszCompare)) {
 		return -1;
 	}
-	
+
 	len = strlen(pszStr);
-	
+
 	for (i = 0;i < len;i++) {
 		if (toupper(pszStr[i]) != toupper(pszCompare[i])) {
 			return -1;
 		}
 	}
-	
+
 	return 0;
 }
 #endif
@@ -70,21 +70,25 @@ int main(int argc, char *argv[])
 {
 	char			szCmd[512];
     bool			bContinueCmdLoop;
-	
+
     if (argc > 1) {
     	processParams(argc, argv);
     }
     else {
+		Cloak * cloak = new Cloak();
+
 		bContinueCmdLoop = true;
-	
+
 		while (bContinueCmdLoop) {
 			cout << "cloak> ";
 			cin.getline(szCmd, 512);
-		
-			bContinueCmdLoop = processCommand(szCmd);
+
+			bContinueCmdLoop = processCommand(cloak, szCmd);
 		}
+
+		delete cloak;
     }
-	
+
     return 0;
 }
 
@@ -108,9 +112,9 @@ void printHeaderInfo(Cloak *cloak)
 	byte	*pReserved;
 	Image	*img;
 	Bitmap  *bmp;
-	
+
 	img = cloak->getSourceImage();
-	
+
 	if (cloak->getSourceImageType() == rgb_bitmap) {
 		bmp = (Bitmap *)img;
 		cout << "File Size = " << bmp->getFileSize() << endl;
@@ -235,9 +239,9 @@ void processParams(int argc, char *argv[])
 			if (bPrintInfo) {
 				printHeaderInfo(cloak);
 			}
-		
+
 			cloak->loadSourceDataFile(szSecretFileName);
-		
+
 			if (keyMode == KEY_PASSWD) {
 				cloak->merge(szOutputFileName, szPassword);
 			}
@@ -259,7 +263,7 @@ void processParams(int argc, char *argv[])
 			if (bPrintInfo) {
 				printHeaderInfo(cloak);
 			}
-		
+
 			if (keyMode == KEY_PASSWD) {
 				cloak->extract(szOutputFileName, szPassword);
 			}
@@ -281,7 +285,7 @@ void processParams(int argc, char *argv[])
 			if (bPrintInfo) {
 				printHeaderInfo(cloak);
 			}
-		
+
 			cloak->copy(szOutputFileName);
 		}
 		catch (Exception *e) {
@@ -295,7 +299,7 @@ void processParams(int argc, char *argv[])
 	delete cloak;
 }
 
-bool processCommand(char *pszCommand)
+bool processCommand(Cloak * cloak, char *pszCommand)
 {
 	char			szImageFilename[FILENAME_BUFFER_LENGTH];
 	char			szSecretFilename[FILENAME_BUFFER_LENGTH];
@@ -303,8 +307,7 @@ bool processCommand(char *pszCommand)
 	char			szPassword[PASSWORD_BUFFER_LENGTH];
 	byte *			pKeyStream;
 	dword			ulKeyLength;
-	static Cloak *	cloak = new Cloak();
-	
+
 	if (_strcmpi(pszCommand, "help") == 0 || _strcmpi(pszCommand, "?") == 0) {
 		cout << "Welcome to Cloak interactive mode!" << endl << endl;
 		cout << "Commands suported are:" << endl;
@@ -337,7 +340,7 @@ bool processCommand(char *pszCommand)
 		try {
 			cout << "Enter input image filename: ";
 			cin.getline(szImageFilename, FILENAME_BUFFER_LENGTH);
-		
+
 			cloak->loadSourceImage(szImageFilename);
 		}
 		catch (Exception *e) {
@@ -350,7 +353,7 @@ bool processCommand(char *pszCommand)
 		try {
 			cout << "Enter input filename: ";
 			cin.getline(szSecretFilename, FILENAME_BUFFER_LENGTH);
-		
+
 			cloak->loadSourceDataFile(szSecretFilename);
 		}
 		catch (Exception *e) {
@@ -364,18 +367,18 @@ bool processCommand(char *pszCommand)
 			if (cloak->getBitsPerByte() == 0) {
 				getBitsPerByte(cloak);
 			}
-			
+
 			cout << "Enter output image filename: ";
 			cin.getline(szImageFilename, FILENAME_BUFFER_LENGTH);
-			
+
 			cout << "Enter keystream filename (Enter = none): ";
 			cin.getline(szKeyFilename, FILENAME_BUFFER_LENGTH);
-		
+
 			if (strlen(szKeyFilename) == 0) {
 				if (getPassword(szPassword, PASSWORD_BUFFER_LENGTH - 1) != 0) {
 					return false;
 				}
-			
+
 				cloak->merge(szImageFilename, szPassword);
 			}
 			else {
@@ -394,18 +397,18 @@ bool processCommand(char *pszCommand)
 			if (cloak->getBitsPerByte() == 0) {
 				getBitsPerByte(cloak);
 			}
-			
+
 			cout << "Enter extracted filename: ";
 			cin.getline(szSecretFilename, FILENAME_BUFFER_LENGTH);
-			
+
 			cout << "Enter keystream filename (Enter = none): ";
 			cin.getline(szKeyFilename, FILENAME_BUFFER_LENGTH);
-			
+
 			if (strlen(szKeyFilename) == 0) {
 				if (getPassword(szPassword, PASSWORD_BUFFER_LENGTH - 1) != 0) {
 					return false;
 				}
-			
+
 				cloak->extract(szSecretFilename, szPassword);
 			}
 			else {
@@ -423,7 +426,7 @@ bool processCommand(char *pszCommand)
 		try {
 			cout << "Enter output image filename: ";
 			cin.getline(szImageFilename, FILENAME_BUFFER_LENGTH);
-		
+
 			cloak->copy(szImageFilename);
 		}
 		catch (Exception *e) {
@@ -444,25 +447,24 @@ bool processCommand(char *pszCommand)
 	}
 	else if (_strcmpi(pszCommand, "quit") == 0 || _strcmpi(pszCommand, "exit") == 0 || _strcmpi(pszCommand, "q") == 0) {
 		cout << "bye..." << endl;
-		delete cloak;
 		return false;
 	}
-	
+
 	return true;
 }
 
 byte * getKeyStream(char *pszKeyFilename, dword * ulKeyLength)
 {
 	byte *		keyStream;
-	
+
 	DataFile * keyFile = new DataFile(pszKeyFilename);
-	
+
 	keyFile->read();
-	
+
 	keyStream = keyFile->getData();
-	
+
 	*ulKeyLength = keyFile->getFileLength();
-	
+
 	return keyStream;
 }
 
@@ -470,12 +472,12 @@ void getBitsPerByte(Cloak *cloak)
 {
 	char	szBitsPerByte[16];
 	word	bitsPerByte;
-	
+
 	cout << "Enter bits per byte (1, 2, or 4): ";
 	cin.getline(szBitsPerByte, 16);
-	
+
 	bitsPerByte = (word)atoi(szBitsPerByte);
-	
+
 	if (bitsPerByte == 1 || bitsPerByte == 2 || bitsPerByte == 4) {
 		cloak->setBitsPerByte((word)atoi(szBitsPerByte));
 	}
@@ -488,38 +490,38 @@ int getPassword(char *pszPassword, int maxLen)
 {
 	char	*pszPassword1;
 	char	*pszPassword2;
-	
+
 	pszPassword1 = (char *)malloc_d(maxLen + 1, "main:getPassword():pszPassword1");
-	
+
 	if (pszPassword1 == NULL) {
 		throw new Exception(ERR_MALLOC, "Failed to allocate memory for password", __FILE__, "main", "getPassword", __LINE__);
 	}
-	
+
 	pszPassword2 = (char *)malloc_d(maxLen + 1, "main:getPassword():pszPassword2");
-	
+
 	if (pszPassword1 == NULL) {
 		throw new Exception(ERR_MALLOC, "Failed to allocate memory for password", __FILE__, "main", "getPassword", __LINE__);
 	}
-	
+
 	cout << "Enter password: ";
 	cout.flush();
 
 	getpwd(pszPassword1, maxLen);
-	
+
 	cout << "Confirm password: ";
 	cout.flush();
 
 	getpwd(pszPassword2, maxLen);
-	
+
 	if (strcmp(pszPassword1, pszPassword2) != 0) {
 		cout << "\nThe passwords do not match!" << endl;
 		cout.flush();
 		return -1;
 	}
-	
+
 	strcpy_s(pszPassword, PASSWORD_BUFFER_LENGTH, pszPassword1);
 	// strcpy_s(pszPassword, PASSWORD_BUFFER_LENGTH, "password");
-	
+
 	free_d(pszPassword1, "main:getPassword():pszPassword1");
 	free_d(pszPassword2, "main:getPassword():pszPassword2");
 
@@ -549,14 +551,14 @@ void getpwd(char *pszPassword, int maxLen)
 
 	i = 0;
 	ch = -1;
-	
+
 	while (ch != 0) {
 	#ifdef _WIN32
 		ch = _getch();
 	#else
 		ch = getchar();
 	#endif
-		
+
 		if (ch != '\n' && ch != '\r') {
 			if (i < maxLen) {
 				cout << "*";

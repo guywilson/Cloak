@@ -11,7 +11,7 @@
 void printUsage();
 void printHeaderInfo(Cloak *cloak);
 void processParams(int argc, char *argv[]);
-bool processCommand(char *pszCommand);
+bool processCommand(Cloak * cloak, char *pszCommand);
 void getBitsPerByte(Cloak *cloak);
 int getPassword(char *pszPassword, int maxLen);
 void getpwd(char *pszPassword, int maxLen);

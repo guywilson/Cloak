@@ -42,19 +42,21 @@ class Image
 	private:
 		char			szFilename[FILENAME_BUFFER_LENGTH];		// Bitmap filename
 		ImageType		type;
-	
+
+		void 			_copy(Image *sourceImage, bool deep);
+
 	protected:
-		byte			*pchData;				// Actual image data
+		byte	*		pchData = NULL;				// Actual image data
 
 		unsigned long	ulDataLength;
 		word  			usBitsPerPixel;			// 1, 2, 4, 8, 16 or 24
 		long            lWidth;					// Width of the image
 		long            lHeight;				// Height of the image
-		
+
 		void			setImageType(ImageType type);
-		
+
 		virtual void	initialise() = 0;
-		
+
 		void			transform(ImageType sourceType, ImageType targetType);
 
 	public:
@@ -62,17 +64,17 @@ class Image
 						Image(byte *pData);
 						Image(Image *sourceImage, bool deep);
 						Image() {}
-						
+
 						~Image();
 
 		ImageType		getImageType();
-		
+
 		byte *			getData();
 		void			setData(byte *pData);
-		
+
 		char		  * getFilename();
 		void			setFilename(char *pszFilename);
-		
+
 		dword			getImageDataLength();
 		void			setImageDataLength(dword ulValue);
 
@@ -86,9 +88,9 @@ class Image
 		void			setHeight(long lValue);
 
 		dword			getCapacity(word bitsPerByte);
-		
+
 		ByteStreamIterator	*	iterator();
-		
+
 		virtual void	read();
 		virtual void	write();
 };
@@ -98,12 +100,12 @@ class PNG : public Image
     private:
 		int				compressionLevel;
 		int				format;
-		
+
 		int				mapFormat(int colourType);
-     
+
 	protected:
 		virtual void	initialise();
-		
+
     public:
                         PNG(char *pszFilename);
                         PNG(byte *pData);
@@ -112,10 +114,10 @@ class PNG : public Image
 
 		int				getCompressionLevel();
 		void			setCompressionLevel(int level);
-		
+
 		int				getFormat();
 		void			setFormat(int fmt);
- 
+
         virtual void    read();
         virtual void    write();
 };
@@ -129,7 +131,7 @@ class Bitmap : public Image
 		dword   		ulFileSize;				// Total length of the bitmap file
 		byte            uchReserved[4];			// Reserved for application use
 		dword   		ulStartOffset;			// Offset of actual bitmap data
-		
+
 		dword			ulHeaderSize;			// Size of the header
 		word  			usColourPlanes;			// Always set to 0
 		dword   		ulCompressionMethod;	// Compression for bitmap data
@@ -137,56 +139,56 @@ class Bitmap : public Image
 		long            lVRes;					// Vertical resolution
 		dword   		ulNumColours;			// Number of colours, 0 for RGB
 		dword   		ulNumImportantColours;	// Usually 0.
-		
+
 		BitmapType		type;					// Bitmap type (Windows or OS/2)
-		
+
         void            initialiseImage();
-     
+
 	protected:
 		virtual void	initialise();
-		
+
 	public:
 						Bitmap(char *pszFilename);
 						Bitmap(byte *pData);
 						Bitmap(Image *sourceImage);
 						Bitmap();
-						
+
 		char		*	getMagicNumber();
 		void			setMagicNumber(char *pszValue);
-		
+
 		dword			getFileSize();
 		void			setFileSize(dword ulValue);
-		
+
 		byte		*	getReserved();
 		void			setReserved(byte *pchValue);
-		
+
 		dword			getStartOffset();
 		void			setStartOffset(dword ulValue);
-		
+
 		dword			getHeaderSize();
 		void			setHeaderSize(dword ulValue);
-		
+
 		word			getColourPlanes();
 		void			setColourPlanes(word usValue);
-		
+
 		dword			getCompressionMethod();
 		void			setCompressionMethod(dword ulValue);
-		
+
 		long			getHorizontalResolution();
 		void			setHorizontalResolution(long lValue);
-		
+
 		long			getVerticalResolution();
 		void			setVerticalResolution(long lValue);
-		
+
 		dword			getNumColours();
 		void			setNumColours(dword ulValue);
-		
+
 		dword			getNumImportantColours();
 		void			setNumImportantColours(dword ulValue);
-		
+
 		BitmapType		getType();
 		void			setType();
-		
+
 		virtual void	read();
 		virtual void	write();
 };

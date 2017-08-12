@@ -24,27 +24,33 @@ Image::Image(byte *pData)
 
 Image::Image(Image *sourceImage, bool deep)
 {
-	this->setImageDataLength(sourceImage->getImageDataLength());
-	this->setBitsPerPixel(sourceImage->getBitsPerPixel());
-	this->setWidth(sourceImage->getWidth());
-	this->setHeight(sourceImage->getHeight());
-	
-	if (deep) {
-		this->pchData = (byte *)malloc_d((size_t)sourceImage->getImageDataLength(), "Image.Image():pchData");
-		
-		if (this->pchData == NULL) {
-			throw new Exception(ERR_MALLOC, "Failed to allocate memory for cloning image data", __FILE__, "Image", "Image()", __LINE__);
-		}
-		
-		memcpy(this->pchData, sourceImage->getData(), sourceImage->getImageDataLength());
-	}
+	_copy(sourceImage, deep);
 }
 
 Image::~Image()
 {
-	free_d(pchData, "Image.~Image():pchData");
+	if (pchData != NULL) {
+		free_d(pchData, "Image.~Image():pchData");
+	}
 }
 
+void Image::_copy(Image *sourceImage, bool deep)
+{
+	this->setImageDataLength(sourceImage->getImageDataLength());
+	this->setBitsPerPixel(sourceImage->getBitsPerPixel());
+	this->setWidth(sourceImage->getWidth());
+	this->setHeight(sourceImage->getHeight());
+
+	if (deep) {
+		this->pchData = (byte *)malloc_d((size_t)sourceImage->getImageDataLength(), "Image.Image():pchData");
+
+		if (this->pchData == NULL) {
+			throw new Exception(ERR_MALLOC, "Failed to allocate memory for cloning image data", __FILE__, "Image", "Image()", __LINE__);
+		}
+
+		memcpy(this->pchData, sourceImage->getData(), sourceImage->getImageDataLength());
+	}
+}
 
 char * Image::getFilename()
 {
@@ -78,30 +84,30 @@ void Image::transform(ImageType sourceType, ImageType targetType)
 	byte *		sourceRow;
 	byte *		targetRow;
 	byte **		rows;
-	
+
 	if (sourceType != targetType) {
 		/*
 		** Bitmap data is encoded in rows left->right with the rows
-		** encoded from bottom to top. Each pixel is encoded with 
+		** encoded from bottom to top. Each pixel is encoded with
 		** 3 channels (RGB) but in BGR order.
 		**
 		** PNG data is encoded in rows left->right with the rows
-		** encoded from top to bottom. Each pixel is encoded with 
+		** encoded from top to bottom. Each pixel is encoded with
 		** 3 channels (RGB), in RGB order.
 		*/
 		rowBytes = getWidth() * 3;
-		
+
 		i = 0L;
 
 		data = pchData;
-		
+
 		rows = (byte **)malloc_d(getHeight() * sizeof(byte *), "Image.transform():rows");
-		
+
 		for (y = getHeight()-1;y >= 0L;--y) {
 			sourceRow = (byte *)malloc_d(rowBytes, "Image.transform():sourceRow");
-			
+
 			rows[y] = sourceRow;
-			
+
 			for (x = 0L;x < rowBytes;x += 3) {
 				sourceRow[x+2] = *data++; //Blue/Red
 				sourceRow[x+1] = *data++; //Green
@@ -110,7 +116,7 @@ void Image::transform(ImageType sourceType, ImageType targetType)
 				i += 3;
 			}
 		}
-		
+
 		if (pchData) {
 			free_d(pchData, "Image.transform():pchData");
 		}
@@ -128,7 +134,7 @@ void Image::transform(ImageType sourceType, ImageType targetType)
 
 			free_d(rows[y], "Image.transform():rows[]");
 		}
-		
+
 		free_d(rows, "Image.transform():rows");
 	}
 }
@@ -174,7 +180,7 @@ void Image::setHeight(long lValue)
 {
 	this->lHeight = lValue;
 }
- 
+
 dword Image::getImageDataLength()
 {
 	return this->ulDataLength;
@@ -188,9 +194,9 @@ void Image::setImageDataLength(dword ulValue)
 ByteStreamIterator *Image::iterator()
 {
 	ByteStreamIterator		*iterator;
-	
+
 	iterator = new ByteStreamIterator(getData(), getImageDataLength());
-	
+
 	return iterator;
 }
 
@@ -222,7 +228,7 @@ PNG::PNG(byte *pData) : Image(pchData)
 PNG::PNG(Image *sourceImage) : Image(sourceImage, true)
 {
 	initialise();
-	
+
 	if (sourceImage->getImageType() == rgb_bitmap) {
 		transform(rgb_bitmap, rgb_png);
 	}
@@ -232,8 +238,8 @@ PNG::PNG() : Image()
 {
 	initialise();
 }
- 
- 
+
+
 void PNG::initialise()
 {
 	this->setImageType(rgb_png);
@@ -278,19 +284,19 @@ void PNG::read()
 	setWidth(details.lWidth);
 	setHeight(details.lHeight);
 	setFormat(mapFormat(details.colourType));
-	
+
 	setImageDataLength(getWidth() * getHeight() * (getBitsPerPixel() / 8));
 }
- 
+
 void PNG::write()
 {
 	PNGDETAILS		details;
-	
+
 	details.compressionLevel = getCompressionLevel();
 	details.lWidth = getWidth();
 	details.lHeight = getHeight();
 	details.usBitsPerPixel = getBitsPerPixel();
-	
+
 	writePngImage(getFilename(), getData(), &details);
 }
 
@@ -308,7 +314,7 @@ Bitmap::Bitmap(byte *pData) : Image(pchData)
 Bitmap::Bitmap(Image *sourceImage) : Image(sourceImage, true)
 {
 	initialise();
-	
+
 	if (sourceImage->getImageType() == rgb_bitmap) {
 		this->setMagicNumber(((Bitmap *)sourceImage)->getMagicNumber());
 		this->setFileSize(((Bitmap *)sourceImage)->getFileSize());
@@ -339,7 +345,7 @@ Bitmap::Bitmap(Image *sourceImage) : Image(sourceImage, true)
 		this->setNumColours(0);
 		this->setNumImportantColours(0);
 		this->setType();
-		
+
 		transform(rgb_png, rgb_bitmap);
 	}
 }
@@ -349,7 +355,7 @@ Bitmap::Bitmap() : Image()
 	initialise();
 }
 
- 
+
 void Bitmap::initialise()
 {
 	this->setImageType(rgb_bitmap);
@@ -505,13 +511,13 @@ void Bitmap::read()
 	byte *		data;
 	char		szHeaderBuffer[BMP_HEADER_SIZE];
 	char		szDIBHeaderBuffer[WINV3_HEADER_SIZE];
-	
+
 	fptr = fopen(getFilename(), "rb");
-	
+
 	if (fptr == NULL) {
 		throw new Exception(ERR_OPEN_BITMAP, "Failed to open bitmap", __FILE__, "Bitmap", "read()", __LINE__);
 	}
-	
+
 	/*
 	** Read bitmap header...
 	*/
@@ -521,15 +527,15 @@ void Bitmap::read()
 	memcpy(&ulFileSize, &szHeaderBuffer[2], 4);
 	memcpy(uchReserved, &szHeaderBuffer[6], 4);
 	memcpy(&ulStartOffset, &szHeaderBuffer[10], 4);
-	
+
 	fread_d(szHeaderBuffer, 1, 4, fptr, "Bitmap.read():szHeaderBuffer");
 	memcpy(&ulHeaderSize, &szHeaderBuffer[0], 4);
-	
+
 	fread_d(szDIBHeaderBuffer, 1, ulHeaderSize - 4, fptr, "Bitmap.read():szDIBHeaderBuffer");
-	
+
 	if (ulHeaderSize == WINV3_HEADER_SIZE) {
 		type = WindowsV3;
-		
+
         memcpy(&lWidth, &szDIBHeaderBuffer[0], 4);
         memcpy(&lHeight, &szDIBHeaderBuffer[4], 4);
         memcpy(&usColourPlanes, &szDIBHeaderBuffer[8], 2);
@@ -548,7 +554,7 @@ void Bitmap::read()
         memcpy(&lHeight, &szDIBHeaderBuffer[2], 2);
         memcpy(&usColourPlanes, &szDIBHeaderBuffer[4], 2);
         memcpy(&usBitsPerPixel, &szDIBHeaderBuffer[6], 2);
-		
+
 		setImageDataLength(ulFileSize - ulStartOffset);
 	}
 	else {
@@ -565,16 +571,16 @@ void Bitmap::read()
 	}
 
 	pchData = (byte *)malloc_d((size_t)getImageDataLength(), "Bitmap.read():pchData");
-	
+
 	if (pchData == NULL) {
 		fclose(fptr);
 		throw new Exception(ERR_MALLOC, "Failed to allocate memory for bitmap data", __FILE__, "Bitmap", "read()", __LINE__);
 	}
-	
+
 	data = pchData;
-	
+
 	fread_d(data, 1, getImageDataLength(), fptr, "Bitmap.read():data");
-	
+
 	fclose(fptr);
 }
 
@@ -583,20 +589,20 @@ void Bitmap::write()
 	FILE		*fptr;
 	char		szHeaderBuffer[BMP_HEADER_SIZE];
 	char		szDIBHeaderBuffer[WINV3_HEADER_SIZE];
-	
+
 	fptr = fopen(getFilename(), "wb");
-	
+
 	if (fptr == NULL) {
 		throw new Exception(ERR_OPEN_BITMAP, "Failed to open bitmap", __FILE__, "Bitmap", "read()", __LINE__);
 	}
-	
+
 	memcpy(&szHeaderBuffer[0], szMagicNumber, 2);
 	memcpy(&szHeaderBuffer[2], &ulFileSize, 4);
 	memcpy(&szHeaderBuffer[6], uchReserved, 4);
 	memcpy(&szHeaderBuffer[10], &ulStartOffset, 4);
-	
+
 	fwrite_d(szHeaderBuffer, 1, BMP_HEADER_SIZE, fptr, "Bitmap.write():szHeaderBuffer");
-	
+
 	if (type == WindowsV3) {
 		memcpy(&szDIBHeaderBuffer[0], &ulHeaderSize, 4);
         memcpy(&szDIBHeaderBuffer[4], &lWidth, 4);
@@ -609,7 +615,7 @@ void Bitmap::write()
         memcpy(&szDIBHeaderBuffer[28], &lVRes, 4);
         memcpy(&szDIBHeaderBuffer[32], &ulNumColours, 4);
         memcpy(&szDIBHeaderBuffer[36], &ulNumImportantColours, 4);
-		
+
 		fwrite(szDIBHeaderBuffer, 1, WINV3_HEADER_SIZE, fptr);
 	}
 	else if (type == OS2V1) {
@@ -618,12 +624,11 @@ void Bitmap::write()
         memcpy(&szDIBHeaderBuffer[6], &lHeight, 2);
         memcpy(&szDIBHeaderBuffer[8], &usColourPlanes, 2);
         memcpy(&szDIBHeaderBuffer[10], &usBitsPerPixel, 2);
-		
+
 		fwrite(szDIBHeaderBuffer, 1, OS2V1_HEADER_SIZE, fptr);
 	}
-	
+
 	fwrite_d(pchData, 1, getImageDataLength(), fptr, "Bitmap.write():pchData");
-	
+
 	fclose(fptr);
 }
-

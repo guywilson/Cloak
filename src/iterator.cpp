@@ -6,7 +6,7 @@ Iterator::Iterator(byte *pchData, dword ulLength)
 {
 	this->data = pchData;
 	this->ulDataLength = ulLength;
-	
+
 	this->counter = 0L;
 }
 
@@ -29,7 +29,7 @@ BitStreamIterator::BitStreamIterator(byte * pchData, dword ulLength, word usBits
 {
 	bitCounter = 0;
 	bitsPerByte = usBitsPerByte;
-	
+
 #ifdef DEBUG_MEMORY
 	printf("BitStreamIterator.BitStreamIterator() - Data length = %ld\n", ulLength);
 #endif
@@ -38,10 +38,10 @@ BitStreamIterator::BitStreamIterator(byte * pchData, dword ulLength, word usBits
 byte BitStreamIterator::nextBits()
 {
 	byte	bits = 0x00;
-	
+
 	bits = (getCurrentByte() >> bitCounter) & getBitMask();
 	bitCounter += bitsPerByte;
-	
+
 	if (bitCounter == 8) {
 		bitCounter = 0;
 		counter++;
@@ -59,11 +59,11 @@ byte BitStreamIterator::getBitMask()
 {
 	int				i;
 	byte			mask = 0x00;
-	
+
 	for (i = 0;i < this->bitsPerByte;i++) {
 		mask += (0x01 << i) & 0xFF;
 	}
-	
+
 	return mask;
 }
 
@@ -71,20 +71,25 @@ byte BitStreamIterator::getBitMask(word usBitsPerByte)
 {
 	int				i;
 	byte			mask = 0x00;
-	
+
 	for (i = 0;i < usBitsPerByte;i++) {
 		mask += (0x01 << i) & 0xFF;
 	}
-	
+
 	return mask;
+}
+
+ByteStreamIterator::ByteStreamIterator(byte * pchData, dword ulLength) : Iterator(pchData, ulLength)
+{
+
 }
 
 byte ByteStreamIterator::nextByte()
 {
 	byte	byte;
-	
+
 	byte = getCurrentByte();
 	counter++;
-	
+
 	return byte;
 }
