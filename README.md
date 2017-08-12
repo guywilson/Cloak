@@ -7,7 +7,7 @@ Cloak will optionally encrypt your 'secret' file using 2 seperate passes through
 
 Building Cloak
 --------------
-Cloak is written in C++ and I have provided makefiles for Unix/Linux (makefile.nix.mak) using the gcc compiler (tested on Ubuntu 16.04 64-bit), for Windows (makefile.win.mak) using Visual Studio C++ (I used VS 2015 Community Edition, tested on Windows 10 64-bit), and for macOS (makefile.mac.mak) using the real gcc compiler v7.1 (I had issues with debugging when compiled with the xcode commnad line tools) and tested on macOS Sierra 10.12.6. Cloak depends on the 3rd party libraries libpng, zlib (both for PNG read/write functionality) and libbsd for Ubuntu (to provide strlcpy/strlcat library functions). I have provided the pre-built libraries libpng.lib and zlib.lib for Windows x64.
+Cloak is written in C++ and I have provided makefiles for Unix/Linux (makefile.nix.mak) using the gcc compiler (tested on Ubuntu 16.04 64-bit), for Windows (makefile.win.mak) using Visual Studio C++ (I used VS 2015 Community Edition, tested on Windows 10 64-bit), and for macOS (makefile.mac.mak) using gcc (xcode commnad line tools) and tested on macOS Sierra 10.12.6. Cloak depends on the 3rd party libraries libpng, zlib (both for PNG read/write functionality) and libbsd for Ubuntu (to provide strlcpy/strlcat library functions). I have provided the pre-built libraries libpng.lib and zlib.lib for Windows x64.
 
 Using Cloak
 -----------
