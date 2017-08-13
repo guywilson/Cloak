@@ -46,7 +46,7 @@ and to 'uncloak' the file:
 
     cloak> load image 
     Enter input image filename: flowers.png
-    cloak> extract file
+    cloak> extract
     Enter bits per byte (1, 2, or 4): 1
     Enter extracted filename: out.pdf
     Enter keystream filename (Enter = none): 
@@ -55,6 +55,6 @@ and to 'uncloak' the file:
     cloak> quit
     bye...
 
-In the case of PNG files, you may notice that the output PNG image from Cloak is significantly smaller than the input image, they are identical in content, it is simply that I have configured libpng in Cloak to use the maximum compression ratio. This is the key difference between PNG images and 24-bit bitmap images, PNG is compressed whereas bitmap (bmp) is not. If you use a bitmap (bmp) file with Cloak you will see that the input and output .bmp files will be exactly the same size.
+In the case of PNG files, you may notice that the output PNG image from Cloak is a different size than the input image, they are identical in content, it is simply that PNG compression will likely result in different size files. This is the key difference between PNG images and 24-bit bitmap images, PNG is compressed whereas bitmap (bmp) is generally not. If you use a bitmap (bmp) file with Cloak you will see that the input and output .bmp files will be exactly the same size.
 
 Have fun!
