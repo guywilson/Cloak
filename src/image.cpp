@@ -248,7 +248,7 @@ PNG::PNG() : Image()
 void PNG::initialise()
 {
 	this->setImageType(rgb_png);
-	this->compressionLevel = 9;
+	this->compressionLevel = PNG_COMPRESSION_LEVEL;
 }
 
 int PNG::getCompressionLevel()

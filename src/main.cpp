@@ -66,6 +66,19 @@ int _strcmpi(const char *pszStr, const char *pszCompare)
 }
 #endif
 
+int _strncmpi(const char *pszStr, const char *pszCompare, int length)
+{
+	int		i;
+
+	for (i = 0;i < length;i++) {
+		if (toupper(pszStr[i]) != toupper(pszCompare[i])) {
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
 int main(int argc, char *argv[])
 {
 	char			szCmd[512];
@@ -198,6 +211,10 @@ void processParams(int argc, char *argv[])
                     // bits per byte...
                     usBitsPerByte = (byte)atoi(&argv[i][2]);
                     break;
+
+				default:
+					cout << "Invalid option (" << argv[i][1] << ") - cloak -? for help" << endl << endl;
+					return;
             }
         }
     }
@@ -315,12 +332,12 @@ bool processCommand(Cloak * cloak, char *pszCommand)
 		cout << "    load image (li)   Load an input image file." << endl;
 		cout << "    load file (lf)    Load an input data file for cloaking." << endl;
 		cout << "    merge (m)         Merge the input data file to the image." << endl;
-		cout << "    extract file (ef) Extract a cloaked file from the input image." << endl;
+		cout << "    extract (e)       Extract a cloaked file from the input image." << endl;
 		cout << "    copy (c)          Copy the input image to an output image." << endl;
 		cout << "    set bits (sb)     Set the bits per byte for cloaking." << endl;
 		cout << "    quit (exit, q)    Leave cloak interactive mode." << endl << endl;
 		cout << "Please note, you will be prompted for a password with both 'merge' and" << endl;
-		cout << "'extract file' commands, not entering a password (just hit enter) will" << endl;
+		cout << "'extract' commands, not entering a password (just hit enter) will" << endl;
 		cout << "not encrypt the file. Entering a password will encrypt the file twice" << endl;
 		cout << "with AES before cloaking it within the image. Cloak will not tell you" << endl;
 		cout << "if you have the password wrong when extracting a file (it won't know" << endl;
@@ -328,7 +345,7 @@ bool processCommand(Cloak * cloak, char *pszCommand)
 		cout << "It is unlikely that anyone (or any government agency) will be able to" << endl;
 		cout << "prove that a given image contains an encrypted file, unless they know" << endl;
 		cout << "the key of course. If you enter a keystream filename in 'merge' or" << endl;
-		cout << "'extract file' mode, cloak will use the data in the keystream file" << endl;
+		cout << "'extract' mode, cloak will use the data in the keystream file" << endl;
 		cout << "to encrypt the file instead (it won't prompt for a password)." << endl;
 		cout << "Encoding with 1-bit per byte has the least impact on viewed image" << endl;
 		cout << "quality but with the least storage capacity, 4-bits per byte will" << endl;
@@ -336,10 +353,26 @@ bool processCommand(Cloak * cloak, char *pszCommand)
 		cout << "can store a file size of approx. 230Kb at 1-bit per byte." << endl;
 		cout << "Good Luck!" << endl;
 	}
-	else if (_strcmpi(pszCommand, "load image") == 0 || _strcmpi(pszCommand, "li") == 0) {
+	else if (_strncmpi(pszCommand, "load image", 10) == 0) {
 		try {
-			cout << "Enter input image filename: ";
-			cin.getline(szImageFilename, FILENAME_BUFFER_LENGTH);
+			if (strlen(pszCommand) > 10) {
+				if (pszCommand[10] == ' ') {
+					strcpy_s(szImageFilename, FILENAME_BUFFER_LENGTH, &pszCommand[11]);
+				}
+				else {
+					throw new Exception(
+								ERR_INVALID_COMMAND,
+								"Invalid command",
+								__FILE__,
+								"main",
+								"processCommand()",
+								__LINE__);
+				}
+			}
+			else {
+				cout << "Enter input image filename: ";
+				cin.getline(szImageFilename, FILENAME_BUFFER_LENGTH);
+			}
 
 			cloak->loadSourceImage(szImageFilename);
 		}
@@ -349,10 +382,84 @@ bool processCommand(Cloak * cloak, char *pszCommand)
 			return 0;
 		}
 	}
-	else if (_strcmpi(pszCommand, "load file") == 0 || _strcmpi(pszCommand, "lf") == 0) {
+	else if (_strncmpi(pszCommand, "li", 2) == 0) {
 		try {
-			cout << "Enter input filename: ";
-			cin.getline(szSecretFilename, FILENAME_BUFFER_LENGTH);
+			if (strlen(pszCommand) > 2) {
+				if (pszCommand[2] == ' ') {
+					strcpy_s(szImageFilename, FILENAME_BUFFER_LENGTH, &pszCommand[3]);
+				}
+				else {
+					throw new Exception(
+								ERR_INVALID_COMMAND,
+								"Invalid command",
+								__FILE__,
+								"main",
+								"processCommand()",
+								__LINE__);
+				}
+			}
+			else {
+				cout << "Enter input image filename: ";
+				cin.getline(szImageFilename, FILENAME_BUFFER_LENGTH);
+			}
+
+			cloak->loadSourceImage(szImageFilename);
+		}
+		catch (Exception *e) {
+			cout << e->getExceptionString() << endl;
+			delete e;
+			return 0;
+		}
+	}
+	else if (_strncmpi(pszCommand, "load file", 9) == 0) {
+		try {
+			if (strlen(pszCommand) > 9) {
+				if (pszCommand[9] == ' ') {
+					strcpy_s(szSecretFilename, FILENAME_BUFFER_LENGTH, &pszCommand[10]);
+				}
+				else {
+					throw new Exception(
+								ERR_INVALID_COMMAND,
+								"Invalid command",
+								__FILE__,
+								"main",
+								"processCommand()",
+								__LINE__);
+				}
+			}
+			else {
+				cout << "Enter input filename: ";
+				cin.getline(szSecretFilename, FILENAME_BUFFER_LENGTH);
+			}
+
+			cloak->loadSourceDataFile(szSecretFilename);
+		}
+		catch (Exception *e) {
+			cout << e->getExceptionString() << endl;
+			delete e;
+			return 0;
+		}
+	}
+	else if (_strncmpi(pszCommand, "lf", 2) == 0) {
+		try {
+			if (strlen(pszCommand) > 2) {
+				if (pszCommand[2] == ' ') {
+					strcpy_s(szSecretFilename, FILENAME_BUFFER_LENGTH, &pszCommand[3]);
+				}
+				else {
+					throw new Exception(
+								ERR_INVALID_COMMAND,
+								"Invalid command",
+								__FILE__,
+								"main",
+								"processCommand()",
+								__LINE__);
+				}
+			}
+			else {
+				cout << "Enter input filename: ";
+				cin.getline(szSecretFilename, FILENAME_BUFFER_LENGTH);
+			}
 
 			cloak->loadSourceDataFile(szSecretFilename);
 		}
@@ -392,7 +499,7 @@ bool processCommand(Cloak * cloak, char *pszCommand)
 			return false;
 		}
 	}
-	else if (_strcmpi(pszCommand, "extract file") == 0 || _strcmpi(pszCommand, "ef") == 0) {
+	else if (_strcmpi(pszCommand, "extract") == 0 || _strcmpi(pszCommand, "e") == 0) {
 		try {
 			if (cloak->getBitsPerByte() == 0) {
 				getBitsPerByte(cloak);
@@ -447,6 +554,10 @@ bool processCommand(Cloak * cloak, char *pszCommand)
 	}
 	else if (_strcmpi(pszCommand, "quit") == 0 || _strcmpi(pszCommand, "exit") == 0 || _strcmpi(pszCommand, "q") == 0) {
 		cout << "bye..." << endl;
+		return false;
+	}
+	else {
+		cout << "Invalid command (" << pszCommand << ") - type 'help' for list of valid connands" << endl;
 		return false;
 	}
 

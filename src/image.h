@@ -34,6 +34,7 @@
 #define PNG_FMT_PALETTE				0x08
 #define PNG_FMT_UNSUPPORTED			0xFF
 
+#define PNG_COMPRESSION_LEVEL		6
 
 enum ImageType {rgb_bitmap, rgb_png, image_type_unknown};
 
