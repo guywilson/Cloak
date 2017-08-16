@@ -599,42 +599,10 @@ void getBitsPerByte(Cloak *cloak)
 
 int getPassword(char *pszPassword, int maxLen)
 {
-	char	*pszPassword1;
-	char	*pszPassword2;
-
-	pszPassword1 = (char *)malloc_d(maxLen + 1, "main:getPassword():pszPassword1");
-
-	if (pszPassword1 == NULL) {
-		throw new Exception(ERR_MALLOC, "Failed to allocate memory for password", __FILE__, "main", "getPassword", __LINE__);
-	}
-
-	pszPassword2 = (char *)malloc_d(maxLen + 1, "main:getPassword():pszPassword2");
-
-	if (pszPassword1 == NULL) {
-		throw new Exception(ERR_MALLOC, "Failed to allocate memory for password", __FILE__, "main", "getPassword", __LINE__);
-	}
-
 	cout << "Enter password: ";
 	cout.flush();
 
-	getpwd(pszPassword1, maxLen);
-
-	cout << "Confirm password: ";
-	cout.flush();
-
-	getpwd(pszPassword2, maxLen);
-
-	if (strcmp(pszPassword1, pszPassword2) != 0) {
-		cout << "\nThe passwords do not match!" << endl;
-		cout.flush();
-		return -1;
-	}
-
-	strcpy_s(pszPassword, PASSWORD_BUFFER_LENGTH, pszPassword1);
-	// strcpy_s(pszPassword, PASSWORD_BUFFER_LENGTH, "password");
-
-	free_d(pszPassword1, "main:getPassword():pszPassword1");
-	free_d(pszPassword2, "main:getPassword():pszPassword2");
+	getpwd(pszPassword, maxLen);
 
 	return 0;
 }
