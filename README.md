@@ -56,3 +56,9 @@ and to 'uncloak' the file:
 In the case of PNG files, you may notice that the output PNG image from Cloak is a different size than the input image, they are identical in content, it is simply that PNG compression will likely result in different size files. This is the key difference between PNG images and 24-bit bitmap images, PNG is compressed whereas bitmap (bmp) is generally not. If you use a bitmap (bmp) file with Cloak you will see that the input and output .bmp files will be exactly the same size.
 
 Have fun!
+
+To Do
+-----
+* Allow the PNG compression ratio to be specified
+* Compress the secret data prior to encoding in the image
+* A drag and drop UI (yeah right)
