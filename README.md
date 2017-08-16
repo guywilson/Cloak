@@ -38,7 +38,6 @@ Using 'interactive' mode, a typical session to encode a file would look like thi
     Enter output image filename: flowers.png
     Enter keystream filename (Enter = none): 
     Enter password: ********
-    Confirm password: ********
     cloak> quit
     bye...
 
@@ -51,7 +50,6 @@ and to 'uncloak' the file:
     Enter extracted filename: out.pdf
     Enter keystream filename (Enter = none): 
     Enter password: ********
-    Confirm password: ********
     cloak> quit
     bye...
 
