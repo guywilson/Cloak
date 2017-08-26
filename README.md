@@ -62,7 +62,7 @@ Have fun!
 
 Known Issues
 ------------
-It appears that images encoded with Cloak on Windows cannot be decoded with Cloak on mac OS or Ubuntu and vice versa.
+* It appears that images encoded with Cloak on Windows cannot be decoded with Cloak on mac OS or Ubuntu and vice versa. I haven't yet worked out why.
 
 To Do
 -----
