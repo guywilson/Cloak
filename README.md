@@ -60,6 +60,10 @@ Tips
 
 Have fun!
 
+Known Issues
+------------
+It appears that images encoded with Cloak on Windows cannot be decoded with Cloak on mac OS or Ubuntu and vice versa.
+
 To Do
 -----
 * Allow the PNG compression ratio to be specified by the user
