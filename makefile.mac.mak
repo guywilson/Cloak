@@ -28,11 +28,14 @@ LINKER=g++
 DBG=-g
 
 # C++ compiler flags
-CPPFLAGS=-c -fpermissive -Wall -std=c++11 $(DBG)
-CFLAGS=-c -Wall $(DBG)
+#CPPFLAGS=-c -fpermissive -Wall -std=c++11 $(DBG)
+#CFLAGS=-c -Wall $(DBG)
+CPPFLAGS=-c -fpermissive -Wall -std=c++11
+CFLAGS=-c -Wall
 
 #Linker flags
-LFLAGS=-lstdc++ $(DBG)
+#LFLAGS=-lstdc++ $(DBG)
+LFLAGS=-lstdc++
 LIBS=-lpng -lz
 
 # Object files (in linker ',' seperated format)
