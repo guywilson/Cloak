@@ -12,7 +12,7 @@ void Exception::_initialise()
 	this->szFileName[0] = '\0';
 	this->szClassName[0] = '\0';
 	this->szMethodName[0] = '\0';
-	
+
 	this->errorCode = 0L;
 	this->lineNumber = 0L;
 }
@@ -81,9 +81,9 @@ char *Exception::getMessage()
 char *Exception::getExceptionString()
 {
 	char		szLineNum[8];
-	
+
 	exception[0] = '\0';
-	
+
 	if (errorCode) {
 	#ifdef _WIN32
 		sprintf_s(exception, EXCEPTION_BUFFER_SIZE, "*** Exception (0x%04X) : ", (unsigned int)errorCode);
@@ -94,10 +94,10 @@ char *Exception::getExceptionString()
 	else {
 		strcat_s(exception, EXCEPTION_BUFFER_SIZE, "*** Exception : ");
 	}
-	
+
 	strcat_s(exception, EXCEPTION_BUFFER_SIZE, szMessage);
 	strcat_s(exception, EXCEPTION_BUFFER_SIZE, " ***");
-	
+
 	if (strlen(szFileName) > 0 && strlen(szClassName) > 0 && strlen(szMethodName) > 0) {
 		strcat_s(exception, EXCEPTION_BUFFER_SIZE, "\nIn ");
 		strcat_s(exception, EXCEPTION_BUFFER_SIZE, szFileName);
@@ -106,13 +106,13 @@ char *Exception::getExceptionString()
 		strcat_s(exception, EXCEPTION_BUFFER_SIZE, "::");
 		strcat_s(exception, EXCEPTION_BUFFER_SIZE, szMethodName);
 	}
-	
+
 	if (lineNumber > 0) {
 		strcat_s(exception, EXCEPTION_BUFFER_SIZE, " at line ");
 	#ifdef _WIN32
-		sprintf_s(szLineNum, 8, "%ld", lineNumber);
+		sprintf_s(szLineNum, 8, "%lu", lineNumber);
 	#else
-		sprintf(szLineNum, "%ld", lineNumber);
+		sprintf(szLineNum, "%lu", lineNumber);
 	#endif
 		strcat_s(exception, EXCEPTION_BUFFER_SIZE, szLineNum);
 	}
