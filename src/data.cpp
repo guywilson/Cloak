@@ -188,7 +188,7 @@ void EncryptedDataFile::encrypt(char *pszPassword)
 	/*
 	** Do not encrypt if no password supplied...
 	*/
-	if (pszPassword != NULL || strlen(pszPassword) > 0) {
+	if (pszPassword != NULL && strlen(pszPassword) > 0) {
 		EncryptionAlgorithm::generateKeyFromPassword(pszPassword, key);
 		EncryptionAlgorithm::getSecondaryKey(key, key2);
 
@@ -219,7 +219,7 @@ void EncryptedDataFile::decrypt(char *pszPassword)
 	/*
 	** Do not encrypt if no password supplied...
 	*/
-	if (pszPassword != NULL || strlen(pszPassword) > 0) {
+	if (pszPassword != NULL && strlen(pszPassword) > 0) {
 		EncryptionAlgorithm::generateKeyFromPassword(pszPassword, key);
 		EncryptionAlgorithm::getSecondaryKey(key, key2);
 
@@ -254,7 +254,9 @@ void EncryptedDataFile::read()
 
 	_getFileLength(fptr);
 
-	data = (byte *)malloc_d(EncryptionAlgorithm::getEncryptedDataLength(this->ulFileLength), "EncryptedDataFile.read():data");
+	ulEncryptedDataLength = EncryptionAlgorithm::getEncryptedDataLength(this->ulFileLength);
+
+	data = (byte *)malloc_d(ulEncryptedDataLength, "EncryptedDataFile.read():data");
 
 	if (data == NULL) {
 		throw new Exception(

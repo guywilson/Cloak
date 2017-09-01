@@ -1,6 +1,9 @@
 #include <stdio.h>
+#include <iostream>
 
 #include "iterator.h"
+
+using namespace std;
 
 Iterator::Iterator(byte *pchData, dword ulLength)
 {
@@ -29,10 +32,6 @@ BitStreamIterator::BitStreamIterator(byte * pchData, dword ulLength, word usBits
 {
 	bitCounter = 0;
 	bitsPerByte = usBitsPerByte;
-
-#ifdef DEBUG_MEMORY
-	printf("BitStreamIterator.BitStreamIterator() - Data length = %ld\n", ulLength);
-#endif
 }
 
 byte BitStreamIterator::nextBits()
@@ -57,14 +56,7 @@ word BitStreamIterator::getBitsPerByte()
 
 byte BitStreamIterator::getBitMask()
 {
-	int				i;
-	byte			mask = 0x00;
-
-	for (i = 0;i < this->bitsPerByte;i++) {
-		mask += (0x01 << i) & 0xFF;
-	}
-
-	return mask;
+	return BitStreamIterator::getBitMask(getBitsPerByte());
 }
 
 byte BitStreamIterator::getBitMask(word usBitsPerByte)
