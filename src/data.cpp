@@ -182,7 +182,6 @@ void EncryptedDataFile::setDefaultExtension(char *pszExtension)
 
 void EncryptedDataFile::encrypt(char *pszPassword)
 {
-	int 	i;
 	byte 	key[16];
 	byte	key2[16];
 
@@ -192,18 +191,6 @@ void EncryptedDataFile::encrypt(char *pszPassword)
 	if (pszPassword != NULL && strlen(pszPassword) > 0) {
 		EncryptionAlgorithm::generateKeyFromPassword(pszPassword, key);
 		EncryptionAlgorithm::getSecondaryKey(key, key2);
-
-		printf("key = 0x");
-		for (i = 0;i < 16;i++) {
-			printf("%02X", key[i]);
-		}
-		printf("\n");
-
-		printf("key2 = 0x");
-		for (i = 0;i < 16;i++) {
-			printf("%02X", key2[i]);
-		}
-		printf("\n");
 
 		AES cipher(data, ulFileLength);
 		ulEncryptedDataLength = cipher.encrypt(key, data);
