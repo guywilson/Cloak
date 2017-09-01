@@ -25,9 +25,15 @@ C=gcc
 # Linker
 LINKER=g++
 
+DBG=-g
+
 # C++ compiler flags
-CPPFLAGS=-c -fpermissive -Wall -std=c++11
-CFLAGS=-c -Wall
+CPPFLAGS=-c -fpermissive -Wall -std=c++11 $(DBG)
+CFLAGS=-c -Wall $(DBG)
+
+#Linker flags
+LFLAGS=-lstdc++ $(DBG)
+LIBS=-lpng -lz
 
 # Object files (in linker ',' seperated format)
 OBJFILES=$(BUILD)/main.o $(BUILD)/md5.o $(BUILD)/exception.o $(BUILD)/iterator.o $(BUILD)/image.o $(BUILD)/data.o $(BUILD)/encryption.o $(BUILD)/cloak.o $(BUILD)/pngreadwrite.o $(BUILD)/aes.o $(BUILD)/memdebug.o
@@ -71,4 +77,4 @@ $(BUILD)/pngreadwrite.o: $(SOURCE)/pngreadwrite.c $(SOURCE)/pngreadwrite.h $(SOU
 	$(C) $(CFLAGS) -I/usr/local/include -o $(BUILD)/pngreadwrite.o $(SOURCE)/pngreadwrite.c
 
 $(TARGET): $(OBJFILES)
-	$(LINKER) -lstdc++ -o $(TARGET) $(OBJFILES) -lpng -lz
+	$(LINKER) $(LFLAGS) -o $(TARGET) $(OBJFILES) $(LIBS)
