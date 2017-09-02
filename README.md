@@ -13,7 +13,7 @@ Using Cloak
 -----------
 Cloak has two modes of operation, command line (driven by command line parameters) and interactive mode (you enter commands at the cloak> prompt). Type Cloak -? to get help on the command line parameters, if you just type Cloak [enter] you will enter interactive mode and can type the 'help' command for a list of available commands.
 
-I have included a sample PNG file with this distribution - flowers.png which has a PDF document encoded within it, the password used to encrypt the file is 'password', I strongly suggest you use much stronger passwords :) N.B. this sample image was created with Cloak on Windows and can be only decoded with Cloak on windows (see Known Issues below).
+I have included a sample PNG file with this distribution - flowers.png which has a PDF document encoded within it, the password used to encrypt the file is 'password', I strongly suggest you use much stronger passwords :)
 
 For example, to 'cloak' a file within flowers.png I used the following command:
 
