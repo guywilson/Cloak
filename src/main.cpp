@@ -566,17 +566,15 @@ bool processCommand(Cloak * cloak, char *pszCommand)
 
 byte * getKeyStream(char *pszKeyFilename, dword * ulKeyLength)
 {
-	byte *		keyStream;
+	Data *		keyData;
 
-	DataFile * keyFile = new DataFile(pszKeyFilename);
+	DataFile keyFile(pszKeyFilename, FILE_OPEN_READ | FILE_MODE_BINARY);
 
-	keyFile->read();
+	*ulKeyLength = keyFile.getLength();
 
-	keyStream = keyFile->getData();
+	keyData = keyFile.read(*ulKeyLength);
 
-	*ulKeyLength = keyFile->getFileLength();
-
-	return keyStream;
+	return keyData->getData();
 }
 
 void getBitsPerByte(Cloak *cloak)

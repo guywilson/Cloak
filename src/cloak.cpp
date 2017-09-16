@@ -18,8 +18,8 @@ Cloak::Cloak()
 {
 	sourceImage = NULL;
 	targetImage = NULL;
-	sourceFile = NULL;
-	targetFile = NULL;
+	sourceData = NULL;
+	targetData = NULL;
 
 	bitsPerByte = (word)0;
 }
@@ -32,11 +32,11 @@ Cloak::~Cloak()
 	if (targetImage != NULL) {
 		delete targetImage;
 	}
-	if (sourceFile != NULL) {
-		delete sourceFile;
+	if (sourceData != NULL) {
+		delete sourceData;
 	}
-	if (targetFile != NULL) {
-		delete targetFile;
+	if (targetData != NULL) {
+		delete targetData;
 	}
 }
 
@@ -119,12 +119,13 @@ void Cloak::loadSourceImage(char *pszFilename)
 
 void Cloak::loadSourceDataFile(char *pszFilename)
 {
-	if (sourceFile != NULL) {
-		delete sourceFile;
+	if (sourceData != NULL) {
+		delete sourceData;
 	}
 
-	sourceFile = new EncryptedDataFile(pszFilename);
-	sourceFile->read();
+	DataFile sourceFile(pszFilename, FILE_OPEN_READ | FILE_MODE_BINARY);
+
+	sourceData = sourceFile.read(sourceFile.getLength());
 }
 
 word Cloak::getBitsPerByte()
@@ -161,7 +162,7 @@ dword Cloak::getImageCapacity()
 
 dword Cloak::getDataFileSize()
 {
-	return sourceFile->getFileLength();
+	return sourceData->getLength();
 }
 
 void Cloak::copy(char *pszFilename)
@@ -232,50 +233,25 @@ void Cloak::_merge(byte * pTargetBytes)
 	byte		bitmapByte;
 	byte		targetByte;
 	byte		bitMask;
-	byte		chSizeBuffer[4];
-	dword		ulFileLength;
 	int			i = 0;
 
 	ByteStreamIterator *bitmapIterator = targetImage->iterator();
-	BitStreamIterator *dataIterator = sourceFile->iterator(bitsPerByte);
+	BitStreamIterator *dataIterator = sourceData->iterator(bitsPerByte);
 
 	bitMask = dataIterator->getBitMask();
-
-	ulFileLength = sourceFile->getFileLength();
-
-	_populateSizeBuffer(ulFileLength, chSizeBuffer);
-
-	BitStreamIterator sizeIterator(chSizeBuffer, 4, 1);
 
 	while (dataIterator->hasNext()) {
 		bitmapByte = bitmapIterator->nextByte();
 
+		dataBits = dataIterator->nextBits();
+
 		/*
-		** Get bits for size of hidden file first, then the actual data bits...
+		** Merge data bits and bitmap data...
+		** First, clear the first n bits and then bitwise OR with data...
 		*/
-		if (sizeIterator.hasNext()) {
-			dataBits = sizeIterator.nextBits();
+		targetByte = (bitmapByte & ~bitMask) | dataBits;
 
-			/*
-			** Merge size data bits and bitmap data...
-			** First, clear the first bit and then bitwise OR with data...
-			** Secret file size is always stored as 1 bit per byte
-			*/
-			targetByte = (bitmapByte & ~0x01) | dataBits;
-
-			pTargetBytes[i++] = targetByte;
-		}
-		else {
-			dataBits = dataIterator->nextBits();
-
-			/*
-			** Merge data bits and bitmap data...
-			** First, clear the first n bits and then bitwise OR with data...
-			*/
-			targetByte = (bitmapByte & ~bitMask) | dataBits;
-
-			pTargetBytes[i++] = targetByte;
-		}
+		pTargetBytes[i++] = targetByte;
 	}
 
 	delete bitmapIterator;
@@ -292,10 +268,9 @@ void Cloak::_extract()
 	byte				chSecretByte = 0x00;;
 	byte				bitMask;
 	byte	*			pchSecretBuffer;
-	byte				chSizeBuffer[4];
+	byte				chHeaderBuffer[DATA_HEADER_SIZE];
 	dword				ulSecretBytes = 0L;
-	dword				ulHiddenFileLength = 0L;
-	bool				readSize = true;
+	bool				readHeader = true;
     int             	bitCounter = 0;
     dword             	pos = 0L;
 
@@ -306,49 +281,48 @@ void Cloak::_extract()
 	while (bitmapIterator->hasNext()) {
 		bitmapByte = bitmapIterator->nextByte();
 
-		/*
-		** Size of secret file is always stored at 1 bit/byte...
-		*/
-		if (readSize) {
-			chSecretBits = bitmapByte & 0x01;
-			chSecretByte += chSecretBits << bitCounter;
+		chSecretBits = bitmapByte & bitMask;
+		chSecretByte += chSecretBits << bitCounter;
 
-			bitCounter++;
-		}
-		else {
-			chSecretBits = bitmapByte & bitMask;
-			chSecretByte += chSecretBits << bitCounter;
-
-			bitCounter += bitsPerByte;
-		}
+		bitCounter += bitsPerByte;
 
         if (bitCounter == 8) {
-			if (readSize) {
-				chSizeBuffer[pos++] = chSecretByte;
+			if (readHeader) {
+				chHeaderBuffer[pos++] = chSecretByte;
 
-				if (pos == 4L) {
-					ulSecretBytes = _getSizeFromBuffer(chSizeBuffer);
+				if (pos == DATA_HEADER_SIZE) {
+					ulSecretBytes = Data::getEncryptedLength(chHeaderBuffer);
 
 					if (ulSecretBytes > getImageCapacity()) {
-						throw new Exception(ERR_NO_HIDDEN_FILE, "Bitmap does not seem to contain a valid hidden file", __FILE__, "Cloak", "extract()", __LINE__);
+						throw new Exception(
+									ERR_NO_HIDDEN_FILE,
+									"Bitmap does not seem to contain a valid hidden file",
+									__FILE__,
+									"Cloak",
+									"extract()",
+									__LINE__);
 					}
 
-					ulHiddenFileLength = EncryptionAlgorithm::getEncryptedDataLength(ulSecretBytes);
-
-					pchSecretBuffer = (byte *)malloc_d(ulHiddenFileLength, "Cloak._extract():pchSecretBuffer");
+					pchSecretBuffer = (byte *)malloc(ulSecretBytes);
 
 					if (pchSecretBuffer == NULL) {
-						throw new Exception(ERR_MALLOC, "Failed to allocate memory for secret file", __FILE__, "Cloak", "extract()", __LINE__);
+						throw new Exception(
+									ERR_MALLOC,
+									"Failed to allocate memory for secret file",
+									__FILE__,
+									"Cloak",
+									"extract()",
+									__LINE__);
 					}
 
-					readSize = false;
+					readHeader = false;
 					pos = 0L;
 				}
 			}
 			else {
 				pchSecretBuffer[pos++] = chSecretByte;
 
-				if (pos >= ulHiddenFileLength) {
+				if (pos >= ulSecretBytes) {
 					break;
 				}
 			}
@@ -360,7 +334,9 @@ void Cloak::_extract()
 
 	delete bitmapIterator;
 
-	targetFile = new EncryptedDataFile(pchSecretBuffer, ulSecretBytes);
+	targetData = new Data(chHeaderBuffer, pchSecretBuffer, ulSecretBytes);
+
+	free(pchSecretBuffer);
 }
 
 void Cloak::merge(char *pszFilename, char *pszPassword)
@@ -369,7 +345,8 @@ void Cloak::merge(char *pszFilename, char *pszPassword)
 
 	validate();
 
-	sourceFile->encrypt(pszPassword);
+	sourceData->compress(5);
+	sourceData->encrypt(pszPassword);
 
 	targetImageType = _getImageType(pszFilename);
 
@@ -393,7 +370,8 @@ void Cloak::merge(char *pszFilename, byte *pbKeystream, dword ulKeyLength)
 
 	validate();
 
-	sourceFile->encrypt(pbKeystream, ulKeyLength);
+	sourceData->compress(5);
+	sourceData->encrypt(pbKeystream, ulKeyLength);
 
 	targetImageType = _getImageType(pszFilename);
 
@@ -415,25 +393,31 @@ void Cloak::extract(char *pszFilename, char *pszPassword)
 {
 	_extract();
 
-	targetFile->setFilename(pszFilename);
-	targetFile->decrypt(pszPassword);
-	targetFile->write();
+	targetData->decrypt(pszPassword);
+	targetData->decompress();
+
+	DataFile outputFile(pszFilename, FILE_OPEN_WRITE | FILE_MODE_BINARY);
+
+	outputFile.write(targetData, targetData->getLength());
 }
 
 void Cloak::extract(char *pszFilename, byte *pbKeystream, dword ulKeyLength)
 {
 	_extract();
 
-	targetFile->setFilename(pszFilename);
-	targetFile->decrypt(pbKeystream, ulKeyLength);
-	targetFile->write();
+	targetData->decrypt(pbKeystream, ulKeyLength);
+	targetData->decompress();
+
+	DataFile outputFile(pszFilename, FILE_OPEN_WRITE | FILE_MODE_BINARY);
+
+	outputFile.write(targetData, targetData->getLength());
 }
 
 void Cloak::validate()
 {
 	dword		ulHiddenFileSize;
 
-	ulHiddenFileSize = ((EncryptionAlgorithm::getEncryptedDataLength(sourceFile->getFileLength()) * 8L) / (dword)bitsPerByte);
+	ulHiddenFileSize = ((EncryptionAlgorithm::getEncryptedDataLength(sourceData->getLength()) * 8L) / (dword)bitsPerByte);
 
 	if (!(bitsPerByte == 1 || bitsPerByte == 2 || bitsPerByte == 4)) {
 		throw new Exception(ERR_VALIDATION, "Invalid bits per byte, must be 1, 2 or 4", __FILE__, "Cloak", "validate()", __LINE__);
