@@ -255,6 +255,11 @@ dword Data::getLength()
 	return this->_length;
 }
 
+dword Data::getTotalLength()
+{
+	return this->_length + DATA_HEADER_SIZE;
+}
+
 void Data::initiateBlockIterator(dword blockSize)
 {
 	this->_blockSize = blockSize;

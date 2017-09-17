@@ -13,6 +13,7 @@ void printHeaderInfo(Cloak *cloak);
 void processParams(int argc, char *argv[]);
 bool processCommand(Cloak * cloak, char *pszCommand);
 void getBitsPerByte(Cloak *cloak);
+void getCompressionLevel(Cloak *cloak);
 int getPassword(char *pszPassword, int maxLen);
 void getpwd(char *pszPassword, int maxLen);
 byte * getKeyStream(char *pszKeyFilename, dword * ulKeyLength);

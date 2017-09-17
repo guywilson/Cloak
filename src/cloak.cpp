@@ -22,6 +22,12 @@ Cloak::Cloak()
 	targetData = NULL;
 
 	bitsPerByte = (word)0;
+	compressionLevel = DEFAULT_COMPRESSION_LEVEL;
+}
+
+Cloak::Cloak(int compressionLevel) : Cloak()
+{
+	setCompressionLevel(compressionLevel);
 }
 
 Cloak::~Cloak()
@@ -128,6 +134,11 @@ void Cloak::loadSourceDataFile(char *pszFilename)
 	sourceData = sourceFile.read(sourceFile.getLength());
 }
 
+void Cloak::setCompressionLevel(int compressionLevel)
+{
+	this->compressionLevel = compressionLevel;
+}
+
 word Cloak::getBitsPerByte()
 {
 	return this->bitsPerByte;
@@ -225,6 +236,36 @@ dword Cloak::_getSizeFromBuffer(byte *pBuffer)
 	memcpy(&ulSize, pBuffer, 4);
 
 	return ulSize;
+}
+
+void Cloak::_printStats()
+{
+	cout << endl << "Stats:" << endl;
+	cout << "\tFile size: " << sourceData->getOriginalLength() << endl;
+
+	if (sourceData->isCompressed()) {
+		cout << "\tCompressed: yes" << endl;
+		cout << "\tCompression level: " << this->compressionLevel << endl;
+		cout <<
+			"\tCompressed size: " <<
+			sourceData->getCompressedLength() <<
+			" (" <<
+			((double)sourceData->getCompressedLength() / (double)sourceData->getOriginalLength()) * 100.0 <<
+			"%)" <<
+			endl;
+	}
+	else {
+		cout << "\tCompressed: no" << endl;
+	}
+
+	if (sourceData->isEncrypted()) {
+		cout << "\tEncrypted: yes" << endl;
+	}
+	else {
+		cout << "\tEncrypted: no" << endl;
+	}
+
+	cout << endl;
 }
 
 void Cloak::_merge(byte * pTargetBytes)
@@ -343,10 +384,12 @@ void Cloak::merge(char *pszFilename, char *pszPassword)
 {
 	byte	*	pTargetBytes;
 
+	sourceData->compress(this->compressionLevel);
+	sourceData->encrypt(pszPassword);
+
 	validate();
 
-	sourceData->compress(5);
-	sourceData->encrypt(pszPassword);
+	_printStats();
 
 	targetImageType = _getImageType(pszFilename);
 
@@ -368,10 +411,12 @@ void Cloak::merge(char *pszFilename, byte *pbKeystream, dword ulKeyLength)
 {
 	byte	*	pTargetBytes;
 
+	sourceData->compress(this->compressionLevel);
+	sourceData->encrypt(pbKeystream, ulKeyLength);
+
 	validate();
 
-	sourceData->compress(5);
-	sourceData->encrypt(pbKeystream, ulKeyLength);
+	_printStats();
 
 	targetImageType = _getImageType(pszFilename);
 
@@ -417,20 +462,44 @@ void Cloak::validate()
 {
 	dword		ulHiddenFileSize;
 
-	ulHiddenFileSize = ((EncryptionAlgorithm::getEncryptedDataLength(sourceData->getLength()) * 8L) / (dword)bitsPerByte);
+	ulHiddenFileSize = (sourceData->getTotalLength() * 8L) / (dword)bitsPerByte;
 
 	if (!(bitsPerByte == 1 || bitsPerByte == 2 || bitsPerByte == 4)) {
-		throw new Exception(ERR_VALIDATION, "Invalid bits per byte, must be 1, 2 or 4", __FILE__, "Cloak", "validate()", __LINE__);
+		throw new Exception(
+					ERR_VALIDATION,
+					"Invalid bits per byte, must be 1, 2 or 4",
+					__FILE__,
+					"Cloak",
+					"validate()",
+					__LINE__);
 	}
 	if (sourceImage->getBitsPerPixel() != 24) {
-		throw new Exception(ERR_VALIDATION, "Image must be 24-bit", __FILE__, "Cloak", "validate()", __LINE__);
+		throw new Exception(
+					ERR_VALIDATION,
+					"Image must be 24-bit",
+					__FILE__,
+					"Cloak",
+					"validate()",
+					__LINE__);
 	}
 	if (sourceImage->getImageDataLength() < ulHiddenFileSize) {
-		throw new Exception(ERR_VALIDATION, "Image not large enough to store file", __FILE__, "Cloak", "validate()", __LINE__);
+		throw new Exception(
+					ERR_VALIDATION,
+					"Image not large enough to store file",
+					__FILE__,
+					"Cloak",
+					"validate()",
+					__LINE__);
 	}
 	if (sourceImage->getImageType() == rgb_png) {
 		if (((PNG *)sourceImage)->getFormat() != PNG_FMT_RGB) {
-			throw new Exception(ERR_VALIDATION, "Image must be RGB format", __FILE__, "Cloak", "validate()", __LINE__);
+			throw new Exception(
+					ERR_VALIDATION,
+					"Image must be RGB format",
+					__FILE__,
+					"Cloak",
+					"validate()",
+					__LINE__);
 		}
 	}
 }

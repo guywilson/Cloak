@@ -108,11 +108,12 @@ int main(int argc, char *argv[])
 void printUsage()
 {
     cout << "Usage:" << endl;
-    cout << "    cloak -a/e -v -i [infile] -o [outfile] -s [secretfile] -k (keystream file) -b [bits per byte]" << endl << endl;
+    cout << "    cloak -a/e -v -i [infile] -o [outfile] -s [secretfile] -k (keystream file) -b[bits per byte] -l[compression level]" << endl << endl;
     cout << "    Where: -a = 'add' mode to add 'secretfile' to 'infile'" << endl;
     cout << "           -e = 'extract' mode to extract 'outfile' from 'infile'" << endl;
     cout << "           -v = 'verbose' mode, print bitmap header info" << endl;
     cout << "           -bn = Bits per byte, must be 1, 2 or 4" << endl;
+    cout << "           -ln = Compression level, must be 0 to 9" << endl;
     cout << "           infile  = an input bitmap" << endl;
     cout << "           outfile = output bitmap (add mode) or extracted file" << endl;
     cout << "           secretfile = secret input file to add to 'infile'" << endl << endl;
@@ -159,6 +160,7 @@ void processParams(int argc, char *argv[])
     int				i;
     bool         	bPrintInfo = false;
 	word			usBitsPerByte;
+	int				compressionLevel = DEFAULT_COMPRESSION_LEVEL;
 	byte *			bKeyStream;
 	dword			ulKeyLength;
 
@@ -212,6 +214,11 @@ void processParams(int argc, char *argv[])
                     usBitsPerByte = (byte)atoi(&argv[i][2]);
                     break;
 
+				case 'l':
+                    // compression level...
+                    compressionLevel = atoi(&argv[i][2]);
+                    break;
+
 				default:
 					cout << "Invalid option (" << argv[i][1] << ") - cloak -? for help" << endl << endl;
 					return;
@@ -245,7 +252,7 @@ void processParams(int argc, char *argv[])
 		usBitsPerByte = 1;
 	}
 
-	Cloak *cloak = new Cloak();
+	Cloak *cloak = new Cloak(compressionLevel);
 
 	cloak->setBitsPerByte(usBitsPerByte);
 
@@ -475,6 +482,8 @@ bool processCommand(Cloak * cloak, char *pszCommand)
 				getBitsPerByte(cloak);
 			}
 
+			getCompressionLevel(cloak);
+
 			cout << "Enter output image filename: ";
 			cin.getline(szImageFilename, FILENAME_BUFFER_LENGTH);
 
@@ -588,10 +597,28 @@ void getBitsPerByte(Cloak *cloak)
 	bitsPerByte = (word)atoi(szBitsPerByte);
 
 	if (bitsPerByte == 1 || bitsPerByte == 2 || bitsPerByte == 4) {
-		cloak->setBitsPerByte((word)atoi(szBitsPerByte));
+		cloak->setBitsPerByte(bitsPerByte);
 	}
 	else {
 		throw new Exception(ERR_VALIDATION, "Bits per byte must be specified as 1, 2 or 4");
+	}
+}
+
+void getCompressionLevel(Cloak *cloak)
+{
+	char	szCompressionLevel[16];
+	int		compressionLevel;
+
+	cout << "Enter compression level (0 - 9, Enter = default): ";
+	cin.getline(szCompressionLevel, 16);
+
+	compressionLevel = atoi(szCompressionLevel);
+
+	if (compressionLevel >= 0 && compressionLevel <= 9) {
+		cloak->setCompressionLevel(compressionLevel);
+	}
+	else {
+		throw new Exception(ERR_VALIDATION, "Compression level must be between 0 and 9");
 	}
 }
 

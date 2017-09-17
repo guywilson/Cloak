@@ -5,19 +5,20 @@
 #ifndef _INCL_CLOAK
 #define _INCL_CLOAK
 
+#define DEFAULT_COMPRESSION_LEVEL		5
+
 class Cloak
 {
 	private:
 		Image *				sourceImage;
 		Image *				targetImage;
 
-// 		EncryptedDataFile *	sourceFile;
-// 		EncryptedDataFile *	targetFile;
-
 		Data *				sourceData;
 		Data *				targetData;
 
 		word				bitsPerByte;
+
+		int					compressionLevel;
 
 		ImageType			sourceImageType;
 		ImageType			targetImageType;
@@ -30,12 +31,17 @@ class Cloak
 		void				_populateSizeBuffer(dword size, byte *pBuffer);
 		dword				_getSizeFromBuffer(byte *pBuffer);
 
+		void				_printStats();
+
 	public:
 							Cloak();
+							Cloak(int compressionLevel);
 							~Cloak();
 
 		word				getBitsPerByte();
 		void				setBitsPerByte(word bitsPerByte);
+
+		void				setCompressionLevel(int CompressionLevel);
 
 		ImageType			getSourceImageType();
 		ImageType			getTargetImageType();

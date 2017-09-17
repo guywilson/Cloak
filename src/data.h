@@ -52,6 +52,7 @@ class Data
 		byte *				getData();
 
 		dword				getLength();
+		dword				getTotalLength();
 
 		void				initiateBlockIterator(dword blockSize);
 		bool				hasNextBlock();
