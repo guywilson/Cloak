@@ -17,7 +17,7 @@ I have included a sample PNG file with this distribution - flowers.png which has
 
 For example, to 'cloak' a file within flowers.png I used the following command:
 
-    cloak -a -i in.png -s secret.pdf -o flowers.png -b1
+    cloak -a -i in.png -s secret.pdf -o flowers.png -b1 -l5
     
 This tells Cloak to use add (merge) mode to encode the file 'secret.pdf' into the image 'in.png' and output the new image 'flowers.png' using an encoding depth of 1-bit per byte.
 
@@ -35,6 +35,7 @@ Using 'interactive' mode, a typical session to encode a file would look like thi
     Enter input filename: secret.pdf
     cloak> merge
     Enter bits per byte (1, 2, or 4): 1
+    Enter compression level (0 - 9, Enter = default): 5
     Enter output image filename: flowers.png
     Enter keystream filename (Enter = none): 
     Enter password: ********
@@ -56,12 +57,10 @@ and to 'uncloak' the file:
 Tips
 ----
 * In the case of PNG files, you may notice that the output PNG image from Cloak is a different size than the input image, they are identical in content, it is simply that PNG compression will likely result in different size files. This is the key difference between PNG images and 24-bit bitmap images, PNG is compressed whereas bitmap (bmp) is generally not. If you use a bitmap (bmp) file with Cloak you will see that the input and output .bmp files will be exactly the same size.
-* I recommend that you zip the data you want to hide before you cloak it in your chosen image. Not only can you store more, and it allows you to store multiple files, it also adds another layer of obstification and helps to remove patterns from the stored data making it harder to spot that there may be something hidden in the image.
 * Try to use an image that is quite 'busy', the flowers.png supplied here is a good example. If you use an image with large areas of a single colour, it may be possible (but unlikely) to spot something encoded within the image.
 
 Have fun!
 
 To Do
 -----
-* Allow the PNG compression ratio to be specified by the user
 * A drag and drop UI (yeah right)
