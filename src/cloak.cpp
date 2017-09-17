@@ -398,6 +398,7 @@ void Cloak::merge(char *pszFilename, char *pszPassword)
 	}
 	else if (targetImageType == rgb_png) {
 		targetImage = new PNG(sourceImage);
+		((PNG *)targetImage)->setCompressionLevel(this->compressionLevel);
 	}
 
 	targetImage->setFilename(pszFilename);
@@ -425,6 +426,7 @@ void Cloak::merge(char *pszFilename, byte *pbKeystream, dword ulKeyLength)
 	}
 	else if (targetImageType == rgb_png) {
 		targetImage = new PNG(sourceImage);
+		((PNG *)targetImage)->setCompressionLevel(this->compressionLevel);
 	}
 
 	targetImage->setFilename(pszFilename);

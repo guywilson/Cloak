@@ -109,10 +109,10 @@ class PNG : public Image
 		virtual void	initialise();
 
     public:
+                        PNG();
                         PNG(char *pszFilename);
                         PNG(byte *pData);
 						PNG(Image *sourceImage);
-                        PNG();
 
 		int				getCompressionLevel();
 		void			setCompressionLevel(int level);
