@@ -415,9 +415,9 @@ dword Data::compress(int level)
 			__LINE__);
 	}
 
-	memcpy(this->_data, compressed, ulSize + DATA_HEADER_SIZE);
+	free(this->_data);
 
-	free(compressed);
+	this->_data = compressed;
 
 	compressedSize = (dword)ulSize;
 
