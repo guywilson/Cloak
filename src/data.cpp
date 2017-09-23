@@ -42,6 +42,7 @@ using namespace std;
 *******************************************************************************/
 Data::Data()
 {
+	this->_data = NULL;
 	this->_initialise();
 }
 
