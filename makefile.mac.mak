@@ -28,18 +28,24 @@ LINKER=g++
 DBG=-g
 
 # C++ compiler flags
-#CPPFLAGS=-c -fpermissive -Wall -std=c++11 $(DBG)
-#CFLAGS=-c -Wall $(DBG)
-CPPFLAGS=-c -fpermissive -Wall -std=c++11
-CFLAGS=-c -Wall
+CPPFLAGS_REL=-c -fpermissive -Wall -std=c++11
+CPPFLAGS_DBG=-c -fpermissive -Wall -std=c++11 $(DBG)
+
+CFLAGS_REL=-c -Wall
+CFLAGS_DBG=-c -Wall $(DBG)
+
+CPPFLAGS=$(CPPFLAGS_REL)
+CFLAGS=$(CFLAGS_REL)
 
 #Linker flags
-#LFLAGS=-lstdc++ $(DBG)
-LFLAGS=-lstdc++
+LFLAGS_REL=-lstdc++
+LFLAGS_DBG=-lstdc++ $(DBG)
+
+LFLAGS=$(LFLAGS_REL)
 LIBS=-lpng -lz
 
 # Object files (in linker ',' seperated format)
-OBJFILES=$(BUILD)/main.o $(BUILD)/md5.o $(BUILD)/exception.o $(BUILD)/iterator.o $(BUILD)/image.o $(BUILD)/data.o $(BUILD)/encryption.o $(BUILD)/cloak.o $(BUILD)/pngreadwrite.o $(BUILD)/aes.o $(BUILD)/memdebug.o
+OBJFILES=$(BUILD)/main.o $(BUILD)/md5.o $(BUILD)/exception.o $(BUILD)/iterator.o $(BUILD)/image.o $(BUILD)/data.o $(BUILD)/encryption.o $(BUILD)/cloak.o $(BUILD)/pngreadwrite.o $(BUILD)/aes.o
 
 # Target
 all: $(TARGET)
@@ -72,9 +78,6 @@ $(BUILD)/main.o: $(SOURCE)/main.cpp $(SOURCE)/cloak.h $(SOURCE)/image.h $(SOURCE
 
 $(BUILD)/aes.o: $(SOURCE)/aes.c $(SOURCE)/aes.h
 	$(C) $(CFLAGS) -o $(BUILD)/aes.o $(SOURCE)/aes.c
-
-$(BUILD)/memdebug.o: $(SOURCE)/memdebug.c $(SOURCE)/memdebug.h $(SOURCE)/types.h
-	$(C) $(CFLAGS) -o $(BUILD)/memdebug.o $(SOURCE)/memdebug.c
 
 $(BUILD)/pngreadwrite.o: $(SOURCE)/pngreadwrite.c $(SOURCE)/pngreadwrite.h $(SOURCE)/writepng.h
 	$(C) $(CFLAGS) -I/usr/local/include -o $(BUILD)/pngreadwrite.o $(SOURCE)/pngreadwrite.c

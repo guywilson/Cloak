@@ -53,7 +53,7 @@ LFLAGS_DBG=$(LFLAGS_REL) /DEBUG /ASSEMBLYDEBUG
 LFLAGS=$(LFLAGS_REL)
 
 # Object files (in linker ',' seperated format)
-OBJFILES=$(BUILD)\main.obj $(BUILD)\md5.obj $(BUILD)\exception.obj $(BUILD)\iterator.obj $(BUILD)\image.obj $(BUILD)\data.obj $(BUILD)\encryption.obj $(BUILD)\cloak.obj $(BUILD)\pngreadwrite.obj $(BUILD)\aes.obj $(BUILD)\memdebug.obj
+OBJFILES=$(BUILD)\main.obj $(BUILD)\md5.obj $(BUILD)\exception.obj $(BUILD)\iterator.obj $(BUILD)\image.obj $(BUILD)\data.obj $(BUILD)\encryption.obj $(BUILD)\cloak.obj $(BUILD)\pngreadwrite.obj $(BUILD)\aes.obj
 
 # Target
 all: $(TARGET) pngtopng.exe savepng.exe
@@ -95,9 +95,6 @@ $(BUILD)\savepng.obj: $(SOURCE)\savepng.c
 
 $(BUILD)\pngreadwrite.obj: $(SOURCE)\pngreadwrite.c $(SOURCE)\pngreadwrite.h $(SOURCE)\writepng.h
 	$(CPP) $(CFLAGS) -Fd$(BUILD)\pngreadwrite.pdb -Fo$(BUILD)\pngreadwrite.obj /Tc$(SOURCE)\pngreadwrite.c
-
-$(BUILD)\memdebug.obj: $(SOURCE)\memdebug.c $(SOURCE)\memdebug.h $(SOURCE)\types.h
-	$(CPP) $(CFLAGS) -Fd$(BUILD)\memdebug.pdb -Fo$(BUILD)\memdebug.obj /Tc$(SOURCE)\memdebug.c
 
 $(TARGET): $(OBJFILES)
 	$(LINKER) $(LFLAGS) /MAP:out.map /PDB:out.pdb /OUT:$(TARGET) $(OBJFILES) /NODEFAULTLIB:libcmt msvcrt.lib $(PNGLIB)\libpng.lib $(PNGLIB)\zlib.lib
