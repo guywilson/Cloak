@@ -219,6 +219,13 @@ void processParams(int argc, char *argv[])
                     compressionLevel = atoi(&argv[i][2]);
                     break;
 
+                case 'd':
+                	// Debug mode, assume default password of 'password'...
+                	// Useful for when debugging with valgrind.
+                	keyMode = KEY_DEBUG;
+                	strcpy_s(szPassword, 128, "password");
+                	break;
+
 				default:
 					cout << "Invalid option (" << argv[i][1] << ") - cloak -? for help" << endl << endl;
 					return;
@@ -349,6 +356,7 @@ bool processCommand(Cloak * cloak, char *pszCommand)
 		cout << "with AES before cloaking it within the image. Cloak will not tell you" << endl;
 		cout << "if you have the password wrong when extracting a file (it won't know" << endl;
 		cout << "what it is) you will just end up with nonsense in your extracted file." << endl;
+		cout << "Cloak will compress the input data file prior to optionally encrypting." << endl;
 		cout << "It is unlikely that anyone (or any government agency) will be able to" << endl;
 		cout << "prove that a given image contains an encrypted file, unless they know" << endl;
 		cout << "the key of course. If you enter a keystream filename in 'merge' or" << endl;
@@ -356,8 +364,12 @@ bool processCommand(Cloak * cloak, char *pszCommand)
 		cout << "to encrypt the file instead (it won't prompt for a password)." << endl;
 		cout << "Encoding with 1-bit per byte has the least impact on viewed image" << endl;
 		cout << "quality but with the least storage capacity, 4-bits per byte will" << endl;
-		cout << "give a noticeable grain effect to most images. An 800 x 800 image" << endl;
-		cout << "can store a file size of approx. 230Kb at 1-bit per byte." << endl;
+		cout << "give a noticeable grain effect to most images. It is best to use" << endl;
+		cout << "an image that is quite 'busy' and avoid an image with large areas" << endl;
+		cout << "of blank colour." << endl;
+		cout << "An 800 x 800 image can store a file size of approx. 230Kb at" << endl;
+		cout << "1-bit per byte uncompressed, more when compressed depending" << endl;
+		cout << "on the compression level chosen." << endl;
 		cout << "Good Luck!" << endl;
 	}
 	else if (_strncmpi(pszCommand, "load image", 10) == 0) {

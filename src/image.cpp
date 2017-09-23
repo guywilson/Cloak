@@ -30,7 +30,7 @@ Image::Image(Image *sourceImage, bool deep)
 void Image::cleanUp()
 {
 	if (pchData != NULL) {
-		free_d(pchData, "Image.~Image():pchData");
+		free(pchData);
 	}
 }
 
@@ -47,7 +47,7 @@ void Image::_copy(Image *sourceImage, bool deep)
 	this->setHeight(sourceImage->getHeight());
 
 	if (deep) {
-		this->pchData = (byte *)malloc_d((size_t)sourceImage->getImageDataLength(), "Image.Image():pchData");
+		this->pchData = (byte *)malloc((size_t)sourceImage->getImageDataLength());
 
 		if (this->pchData == NULL) {
 			throw new Exception(ERR_MALLOC, "Failed to allocate memory for cloning image data", __FILE__, "Image", "Image()", __LINE__);
@@ -106,10 +106,10 @@ void Image::transform(ImageType sourceType, ImageType targetType)
 
 		data = pchData;
 
-		rows = (byte **)malloc_d(getHeight() * sizeof(byte *), "Image.transform():rows");
+		rows = (byte **)malloc(getHeight() * sizeof(byte *));
 
 		for (y = getHeight()-1;y >= 0L;--y) {
-			sourceRow = (byte *)malloc_d(rowBytes, "Image.transform():sourceRow");
+			sourceRow = (byte *)malloc(rowBytes);
 
 			rows[y] = sourceRow;
 
@@ -123,10 +123,10 @@ void Image::transform(ImageType sourceType, ImageType targetType)
 		}
 
 		if (pchData) {
-			free_d(pchData, "Image.transform():pchData");
+			free(pchData);
 		}
 
-		pchData = (byte *)malloc_d(getImageDataLength(), "Image.transform():pchData");
+		pchData = (byte *)malloc(getImageDataLength());
 
 		i = 0L;
 
@@ -137,10 +137,10 @@ void Image::transform(ImageType sourceType, ImageType targetType)
 				pchData[i++] = *targetRow++;
 			}
 
-			free_d(rows[y], "Image.transform():rows[]");
+			free(rows[y]);
 		}
 
-		free_d(rows, "Image.transform():rows");
+		free(rows);
 	}
 }
 
@@ -399,7 +399,7 @@ byte *Bitmap::getReserved()
 void Bitmap::setReserved(byte *pchValue)
 {
 	if (pchValue != NULL) {
-		memcpy_d(this->uchReserved, pchValue, 4, "Bitmap.setReserved():pchValue->uchReserved");
+		memcpy(this->uchReserved, pchValue, 4);
 	}
 }
 
@@ -526,17 +526,17 @@ void Bitmap::read()
 	/*
 	** Read bitmap header...
 	*/
-	fread_d(szHeaderBuffer, 1, BMP_HEADER_SIZE, fptr, "Bitmap.read():szHeaderBuffer");
+	fread(szHeaderBuffer, 1, BMP_HEADER_SIZE, fptr);
 
 	memcpy(szMagicNumber, &szHeaderBuffer[0], 2);
 	memcpy(&ulFileSize, &szHeaderBuffer[2], 4);
 	memcpy(uchReserved, &szHeaderBuffer[6], 4);
 	memcpy(&ulStartOffset, &szHeaderBuffer[10], 4);
 
-	fread_d(szHeaderBuffer, 1, 4, fptr, "Bitmap.read():szHeaderBuffer");
+	fread(szHeaderBuffer, 1, 4, fptr);
 	memcpy(&ulHeaderSize, &szHeaderBuffer[0], 4);
 
-	fread_d(szDIBHeaderBuffer, 1, ulHeaderSize - 4, fptr, "Bitmap.read():szDIBHeaderBuffer");
+	fread(szDIBHeaderBuffer, 1, ulHeaderSize - 4, fptr);
 
 	if (ulHeaderSize == WINV3_HEADER_SIZE) {
 		type = WindowsV3;
@@ -575,7 +575,7 @@ void Bitmap::read()
 		throw new Exception(ERR_FSEEK, "Failed to seek to start of bitmap data", __FILE__, "Bitmap", "read()", __LINE__);
 	}
 
-	pchData = (byte *)malloc_d((size_t)getImageDataLength(), "Bitmap.read():pchData");
+	pchData = (byte *)malloc((size_t)getImageDataLength());
 
 	if (pchData == NULL) {
 		fclose(fptr);
@@ -584,7 +584,7 @@ void Bitmap::read()
 
 	data = pchData;
 
-	fread_d(data, 1, getImageDataLength(), fptr, "Bitmap.read():data");
+	fread(data, 1, getImageDataLength(), fptr);
 
 	fclose(fptr);
 }
@@ -606,7 +606,7 @@ void Bitmap::write()
 	memcpy(&szHeaderBuffer[6], uchReserved, 4);
 	memcpy(&szHeaderBuffer[10], &ulStartOffset, 4);
 
-	fwrite_d(szHeaderBuffer, 1, BMP_HEADER_SIZE, fptr, "Bitmap.write():szHeaderBuffer");
+	fwrite(szHeaderBuffer, 1, BMP_HEADER_SIZE, fptr);
 
 	if (type == WindowsV3) {
 		memcpy(&szDIBHeaderBuffer[0], &ulHeaderSize, 4);
@@ -633,7 +633,7 @@ void Bitmap::write()
 		fwrite(szDIBHeaderBuffer, 1, OS2V1_HEADER_SIZE, fptr);
 	}
 
-	fwrite_d(pchData, 1, getImageDataLength(), fptr, "Bitmap.write():pchData");
+	fwrite(pchData, 1, getImageDataLength(), fptr);
 
 	fclose(fptr);
 }

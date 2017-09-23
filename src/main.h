@@ -5,6 +5,7 @@
 
 #define		KEY_PASSWD				0x01
 #define		KEY_STREAM				0x10
+#define		KEY_DEBUG				0xFF
 
 #define PASSWORD_BUFFER_LENGTH		65
 
