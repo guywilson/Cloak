@@ -84,3 +84,6 @@ $(BUILD)/pngreadwrite.o: $(SOURCE)/pngreadwrite.c $(SOURCE)/pngreadwrite.h $(SOU
 
 $(TARGET): $(OBJFILES)
 	$(LINKER) $(LFLAGS) -o $(TARGET) $(OBJFILES) $(LIBS)
+
+install: $(TARGET)
+	cp ./$(TARGET) /usr/local/bin
