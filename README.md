@@ -9,6 +9,26 @@ Building Cloak
 --------------
 Cloak is written in C++ and I have provided makefiles for Unix/Linux (makefile.nix.mak) using the gcc compiler (tested on Ubuntu 16.04 64-bit), for Windows (makefile.win.mak) using Visual Studio C++ (I used VS 2015 Community Edition, tested on Windows 10 64-bit), and for macOS (makefile.mac.mak) using gcc (xcode commnad line tools) and tested on macOS Sierra 10.12.6. Cloak depends on the 3rd party libraries libpng, zlib (both for PNG read/write functionality) and libbsd for Ubuntu (to provide strlcpy/strlcat library functions). I have provided the pre-built libraries libpng.lib and zlib.lib for Windows x64.
 
+It is recommended that you copy the system specific makefile.xxx.mak to the file 'makefile', e.g. on macOs
+
+    cp makefile.mac.mak makefile
+
+Build cloak using the system make utility, e.g. on Linux/macOs
+
+    make
+    
+and on Windows using Microsoft's make utility
+
+    nmake
+
+I've included an install target in the macOs and Linux makefiles which will copy the target executable to /usr/local/bin:
+
+    make install
+    
+On Windows you can copy the executable (cloak.exe) to a location on the path, or add the directory where the executable has been built to the path:
+
+    set PATH=PATH;C:\development\Cloak
+
 Using Cloak
 -----------
 Cloak has two modes of operation, command line (driven by command line parameters) and interactive mode (you enter commands at the cloak> prompt). Type Cloak -? to get help on the command line parameters, if you just type Cloak [enter] you will enter interactive mode and can type the 'help' command for a list of available commands.
