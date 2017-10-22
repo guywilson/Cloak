@@ -4,9 +4,6 @@
 #include <string.h>
 #include <ctype.h>
 
-extern "C" {
-	#include "memdebug.h"
-}
 #include "cloak.h"
 #include "encryption.h"
 #include "exception.h"

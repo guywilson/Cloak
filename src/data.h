@@ -1,5 +1,4 @@
 #include "iterator.h"
-#include "safebuffer.h"
 #include "types.h"
 
 #ifndef _INCL_DATA

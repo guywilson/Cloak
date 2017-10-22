@@ -4,9 +4,6 @@
 #include <zlib.h>
 #include <iostream>
 
-extern "C" {
-	#include "memdebug.h"
-}
 #include "secure_func.h"
 #include "data.h"
 #include "encryption.h"

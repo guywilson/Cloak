@@ -9,7 +9,6 @@
 
 extern "C" {
 	#include "pngreadwrite.h"
-	#include "memdebug.h"
 }
 
 Image::Image(char *pszFilename)

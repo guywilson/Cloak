@@ -32,10 +32,6 @@
 #include <termios.h>
 #endif
 
-extern "C" {
-	#include "memdebug.h"
-}
-
 #include "secure_func.h"
 #include "cloak.h"
 #include "exception.h"
