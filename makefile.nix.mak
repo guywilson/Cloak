@@ -42,19 +42,16 @@ LFLAGS_REL=-lstdc++
 LFLAGS_DBG=-lstdc++ $(DBG)
 
 LFLAGS=$(LFLAGS_REL)
-LIBS=-lpng -lz -lbsd
+LIBS=-lpng -lz -lbsd -lsph
 
 # Object files (in linker ',' seperated format)
-OBJFILES=$(BUILD)/main.o $(BUILD)/md5.o $(BUILD)/exception.o $(BUILD)/iterator.o $(BUILD)/image.o $(BUILD)/data.o $(BUILD)/encryption.o $(BUILD)/cloak.o $(BUILD)/pngreadwrite.o $(BUILD)/aes.o
+OBJFILES=$(BUILD)/main.o $(BUILD)/exception.o $(BUILD)/iterator.o $(BUILD)/image.o $(BUILD)/data.o $(BUILD)/encryption.o $(BUILD)/cloak.o $(BUILD)/pngreadwrite.o $(BUILD)/aes.o
 
 # Target
 all: $(TARGET)
 
 # Compile C++ source files
 #
-$(BUILD)/md5.o: $(SOURCE)/md5.cpp $(SOURCE)/md5.h $(SOURCE)/types.h
-	$(CPP) $(CPPFLAGS) -o $(BUILD)/md5.o $(SOURCE)/md5.cpp
-
 $(BUILD)/exception.o: $(SOURCE)/exception.cpp $(SOURCE)/exception.h $(SOURCE)/errorcodes.h $(SOURCE)/types.h
 	$(CPP) $(CPPFLAGS) -o $(BUILD)/exception.o $(SOURCE)/exception.cpp
 
@@ -67,7 +64,7 @@ $(BUILD)/image.o: $(SOURCE)/image.cpp $(SOURCE)/image.h $(SOURCE)/iterator.h $(S
 $(BUILD)/data.o: $(SOURCE)/data.cpp $(SOURCE)/data.h $(SOURCE)/iterator.h $(SOURCE)/encryption.h $(SOURCE)/exception.h $(SOURCE)/errorcodes.h $(SOURCE)/types.h
 	$(CPP) $(CPPFLAGS) -o $(BUILD)/data.o $(SOURCE)/data.cpp
 	
-$(BUILD)/encryption.o: $(SOURCE)/encryption.cpp $(SOURCE)/encryption.h $(SOURCE)/md5.h $(SOURCE)/exception.h $(SOURCE)/errorcodes.h $(SOURCE)/types.h $(SOURCE)/salt.h $(SOURCE)/key.h
+$(BUILD)/encryption.o: $(SOURCE)/encryption.cpp $(SOURCE)/encryption.h $(SOURCE)/exception.h $(SOURCE)/errorcodes.h $(SOURCE)/types.h
 	$(CPP) $(CPPFLAGS) -o $(BUILD)/encryption.o $(SOURCE)/encryption.cpp
 
 $(BUILD)/cloak.o: $(SOURCE)/cloak.cpp $(SOURCE)/cloak.h $(SOURCE)/image.h $(SOURCE)/data.h $(SOURCE)/iterator.h $(SOURCE)/exception.h $(SOURCE)/errorcodes.h $(SOURCE)/types.h

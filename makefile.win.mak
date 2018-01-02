@@ -53,16 +53,13 @@ LFLAGS_DBG=$(LFLAGS_REL) /DEBUG /ASSEMBLYDEBUG
 LFLAGS=$(LFLAGS_REL)
 
 # Object files (in linker ',' seperated format)
-OBJFILES=$(BUILD)\main.obj $(BUILD)\md5.obj $(BUILD)\exception.obj $(BUILD)\iterator.obj $(BUILD)\image.obj $(BUILD)\data.obj $(BUILD)\encryption.obj $(BUILD)\cloak.obj $(BUILD)\pngreadwrite.obj $(BUILD)\aes.obj
+OBJFILES=$(BUILD)\main.obj $(BUILD)\exception.obj $(BUILD)\iterator.obj $(BUILD)\image.obj $(BUILD)\data.obj $(BUILD)\encryption.obj $(BUILD)\cloak.obj $(BUILD)\pngreadwrite.obj $(BUILD)\aes.obj
 
 # Target
 all: $(TARGET) pngtopng.exe savepng.exe
 
 # Compile C++ source files
 #
-$(BUILD)\md5.obj: $(SOURCE)\md5.cpp $(SOURCE)\md5.h $(SOURCE)\types.h
-	$(CPP) $(CPPFLAGS) -Fd$(BUILD)\md5.pdb -Fo$(BUILD)\md5.obj $(SOURCE)\md5.cpp
-
 $(BUILD)\exception.obj: $(SOURCE)\exception.cpp $(SOURCE)\exception.h $(SOURCE)\errorcodes.h $(SOURCE)\types.h
 	$(CPP) $(CPPFLAGS) -Fd$(BUILD)\exception.pdb -Fo$(BUILD)\exception.obj $(SOURCE)\exception.cpp
 
@@ -75,7 +72,7 @@ $(BUILD)\image.obj: $(SOURCE)\image.cpp $(SOURCE)\image.h $(SOURCE)\iterator.h $
 $(BUILD)\data.obj: $(SOURCE)\data.cpp $(SOURCE)\data.h $(SOURCE)\iterator.h $(SOURCE)\encryption.h $(SOURCE)\exception.h $(SOURCE)\errorcodes.h $(SOURCE)\types.h
 	$(CPP) $(CPPFLAGS) -Fd$(BUILD)\data.pdb -Fo$(BUILD)\data.obj $(SOURCE)\data.cpp
 	
-$(BUILD)\encryption.obj: $(SOURCE)\encryption.cpp $(SOURCE)\encryption.h $(SOURCE)\md5.h $(SOURCE)\exception.h $(SOURCE)\errorcodes.h $(SOURCE)\types.h $(SOURCE)\salt.h $(SOURCE)\key.h
+$(BUILD)\encryption.obj: $(SOURCE)\encryption.cpp $(SOURCE)\encryption.h $(SOURCE)\exception.h $(SOURCE)\errorcodes.h $(SOURCE)\types.h
 	$(CPP) $(CPPFLAGS) -Fd$(BUILD)\encryption.pdb -Fo$(BUILD)\encryption.obj $(SOURCE)\encryption.cpp
 
 $(BUILD)\cloak.obj: $(SOURCE)\cloak.cpp $(SOURCE)\cloak.h $(SOURCE)\image.h $(SOURCE)\data.h $(SOURCE)\iterator.h $(SOURCE)\exception.h $(SOURCE)\errorcodes.h $(SOURCE)\types.h
@@ -97,7 +94,7 @@ $(BUILD)\pngreadwrite.obj: $(SOURCE)\pngreadwrite.c $(SOURCE)\pngreadwrite.h $(S
 	$(CPP) $(CFLAGS) -Fd$(BUILD)\pngreadwrite.pdb -Fo$(BUILD)\pngreadwrite.obj /Tc$(SOURCE)\pngreadwrite.c
 
 $(TARGET): $(OBJFILES)
-	$(LINKER) $(LFLAGS) /MAP:out.map /PDB:out.pdb /OUT:$(TARGET) $(OBJFILES) /NODEFAULTLIB:libcmt msvcrt.lib $(PNGLIB)\libpng.lib $(PNGLIB)\zlib.lib
+	$(LINKER) $(LFLAGS) /MAP:out.map /PDB:out.pdb /OUT:$(TARGET) $(OBJFILES) /NODEFAULTLIB:libcmt msvcrt.lib $(PNGLIB)\libpng.lib $(PNGLIB)\zlib.lib $(PNGLIB)\libsph.lib
 	copy $(TARGET) $(DEPLOYLOC)
 
 pngtopng.exe: $(BUILD)\pngtopng.obj
