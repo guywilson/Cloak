@@ -11,6 +11,7 @@ A good password is one that cannot be broken using a dictionary attack, e.g. don
 
 References:
 https://en.wikipedia.org/wiki/Dictionary_attack
+
 https://en.wikipedia.org/wiki/Password_strength
 
 Building Cloak
