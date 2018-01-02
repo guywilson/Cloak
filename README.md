@@ -15,7 +15,7 @@ https://en.wikipedia.org/wiki/Password_strength
 
 Building Cloak
 --------------
-Cloak is written in C++ and I have provided makefiles for Unix/Linux (makefile.nix.mak) using the gcc compiler (tested on Ubuntu 16.04 64-bit), for Windows (makefile.win.mak) using Visual Studio C++ (I used VS 2015 Community Edition, tested on Windows 10 64-bit), and for macOS (makefile.mac.mak) using gcc (xcode commnad line tools) and tested on macOS Sierra 10.12.6. Cloak depends on the 3rd party libraries libpng, zlib (both for PNG read/write functionality) and libbsd for Ubuntu (to provide strlcpy/strlcat library functions). I have provided the pre-built libraries libpng.lib and zlib.lib for Windows x64.
+Cloak is written in C++ and I have provided makefiles for Unix/Linux (makefile.nix.mak) using the gcc compiler (tested on Ubuntu 16.04 64-bit), for Windows (makefile.win.mak) using Visual Studio C++ (I used VS 2015 Community Edition, tested on Windows 10 64-bit), and for macOS (makefile.mac.mak) using gcc (xcode commnad line tools) and tested on macOS Sierra 10.12.6. Cloak depends on the 3rd party libraries libpng, zlib (both for PNG read/write functionality), libsph - http://www.saphir2.com/sphlib/ (for SHA-512) and libbsd for Ubuntu (to provide strlcpy/strlcat library functions). I have provided the pre-built libraries libpng.lib and zlib.lib for Windows x64.
 
 It is recommended that you copy the system specific makefile.xxx.mak to the file 'makefile', e.g. on macOs
 
