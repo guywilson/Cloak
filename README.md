@@ -3,7 +3,15 @@ Hide and extract an encrypted file within an RGB (24-bit) bitmap or PNG image.
 
 The idea is simple, a 24-bit colour bitmap or PNG image uses 3 bytes for each pixel in the image, one each for Red, Green and Blue, so each colour channel is represented by a value between 0 - 255. If we encode a file in the least significant bits (LSBs) of the image data, there will be no visible difference in the image when displayed. At an encoding depth of 1-bit per byte, we need 8 bytes of image data to encode 1 byte of our file.
 
-Cloak compresses and then optionally encrypts your 'secret' data file using 2 seperate passes through the 128-bit AES cipher followed by a pass through an XOR cipher prior to encoding it in your chosen image. You will be prompted to enter a password which is used as the key for the first pass through AES, a seperate derived key is then used for the second pass, likewise, a derived key is used for the final XOR pass. Cloak can also encrypt using a supplied keystream file using simple XOR encryption, the advantage of this mechanism is you can employ a one-time-pad scheme, which providing you stick to the rules for a one-time-pad encryption scheme, is mathematically proven to be unbreakable. Of course, any encryption scheme is useless if some third party has got hold of your encryption key.
+Cloak compresses and then optionally encrypts your 'secret' data file using the 128-bit AES cipher prior to encoding it in your chosen image. You will be prompted to enter a password (max 64 chars), the SHA-512 hash of which is used as the key for the pass through AES. Cloak can also encrypt using a supplied keystream file using simple XOR encryption, the advantage of this mechanism is you can employ a one-time-pad scheme, which providing you stick to the rules for a one-time-pad encryption scheme, is mathematically proven to be unbreakable. Of course, any encryption scheme is useless if some third party has got hold of your encryption key.
+
+Some hints regarding password strength
+--------------------------------------
+A good password is one that cannot be broken using a dictionary attack, e.g. don't use a word from the dictionary or a derivation of. Use a made-up word or phrase with symbols and numbers, better stil a random string of characters. In the context of this software, an important aspect is getting the password to your intended audience securely.
+
+References:
+https://en.wikipedia.org/wiki/Dictionary_attack
+https://en.wikipedia.org/wiki/Password_strength
 
 Building Cloak
 --------------
