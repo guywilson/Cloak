@@ -3,14 +3,15 @@
 #include <iostream>
 
 #include "encryption.h"
-#include "salt.h"
 #include "errorcodes.h"
 #include "exception.h"
-#include "key.h"
 
 extern "C" {
+	#include <sph_sha2.h>
 	#include "aes.h"
 }
+
+using namespace std;
 
 EncryptionAlgorithm::EncryptionAlgorithm(PBYTE pInputData, dword ulDataLength)
 {
@@ -45,9 +46,10 @@ dword EncryptionAlgorithm::getEncryptedDataLength(dword ulDataLength)
 
 PBYTE EncryptionAlgorithm::generateKeyFromPassword(PSZ pszPassword, PBYTE key)
 {
-	dword		i;
-	dword		pwdLength;
-	byte		pwd[64];
+	dword				i;
+	dword				pwdLength;
+	byte				pwd[64];
+	sph_sha512_context	ctx;
 
 	pwdLength = (dword)strlen(pszPassword);
 
@@ -64,72 +66,32 @@ PBYTE EncryptionAlgorithm::generateKeyFromPassword(PSZ pszPassword, PBYTE key)
 						__LINE__);
 	}
 
-	/*
-	** Copy the password + remainder of the salt into a byte array...
-	*/
-	for (i = 0;i < SALT_LENGTH;i++) {
-		if (i < pwdLength) {
-			pwd[i] = (byte)pszPassword[i];
-		}
-		else {
-			pwd[i] = salt[i];
-		}
+	for (i = 0;i < 64;i++) {
+		pwd[i] = (byte)pszPassword[i];
 	}
 
 	/*
-	** Get the MD5 hash of the password...
+	** Get the SHA-512 hash of the password...
 	*/
-	MD5 hash;
-	hash.initialise();
-	hash.update(pwd, SALT_LENGTH);
-	hash.finalise(key);
-	hash.clear();
+	sph_sha512_init(&ctx);
+	sph_sha512(&ctx, pwd, pwdLength);
+	sph_sha512_close(&ctx, key);
+
+	/*
+	** Debug block...
+
+	int		j = 0;
+	char	szKey[129];
+
+	for (i = 0;i < KEY_LENGTH;i++) {
+		sprintf(&szKey[j], "%02X", key[i]);
+		j += 2;
+	}
+
+	cout << "Key for password '" << pszPassword << "' is '0x" << szKey << "'" << endl;
+	*/
 
 	return key;
-}
-
-void EncryptionAlgorithm::getSecondaryKey(PBYTE pInitialKey, PBYTE pSecondaryKey)
-{
-	int			i;
-	int			j = 0;
-	int			bank = 0;
-	int			keyIndex = 0;
-	byte		b;
-	byte		key[16];
-	char		szPasswordFromKey[33];
-	static char hexChars[17] = "0123456789ABCDEF";
-
-	/*
-	** Build a 32 character hex string from the binary key...
-	*/
-	for (i = 0;i < 16;i++) {
-		szPasswordFromKey[j++] = hexChars[(pInitialKey[i] >> 4) & 0x0F];
-		szPasswordFromKey[j++] = hexChars[pInitialKey[i] & 0x0F];
-	}
-	szPasswordFromKey[j] = 0;
-
-	/*
-	** Generate a new key from the hex representation of the original key
-	*/
-	EncryptionAlgorithm::generateKeyFromPassword(szPasswordFromKey, key);
-
-	/*
-	** Use each byte of the new key as a lookup to the staticKey table
-	** defined in key.h
-	*/
-	for (i = 0;i < 16;i++) {
-		b = key[i];
-
-		keyIndex = (int)b + (256 * bank);
-
-		bank++;
-
-		if (bank == 4) {
-			bank = 0;
-		}
-
-		pSecondaryKey[i] = keyTable[keyIndex];
-	}
 }
 
 void EncryptionAlgorithm::getNextDataBlock(PBYTE block)

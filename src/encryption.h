@@ -1,13 +1,10 @@
 #include "types.h"
-#include "md5.h"
 
 #ifndef _INCL_ENCRYPTION
 #define	_INCL_ENCRYPTION
 
 #define BLOCK_SIZE			16
-#define KEY_LENGTH			16
-
-#define STATIC_KEY_LENGTH		1024
+#define KEY_LENGTH			64
 
 class EncryptionAlgorithm
 {
@@ -28,7 +25,6 @@ class EncryptionAlgorithm
 						~EncryptionAlgorithm();
 
 		static PBYTE	generateKeyFromPassword(PSZ pszPassword, PBYTE key);
-		static void 	getSecondaryKey(PBYTE pInitialKey, PBYTE pSecondaryKey);
 
 		dword			getEncryptedDataLength();
 		static dword	getEncryptedDataLength(dword ulDataLength);

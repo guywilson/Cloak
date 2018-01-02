@@ -9,7 +9,6 @@
 #include "encryption.h"
 #include "exception.h"
 #include "errorcodes.h"
-#include "key.h"
 
 using namespace std;
 
@@ -298,8 +297,7 @@ BitStreamIterator * Data::iterator(word usBitsPerByte)
 
 void Data::encrypt(char * pszPassword)
 {
-	byte 	key[16];
-	byte	key2[16];
+	byte 	key[KEY_LENGTH];
 	byte *	data;
 
 	/*
@@ -307,7 +305,6 @@ void Data::encrypt(char * pszPassword)
 	*/
 	if (pszPassword != NULL && strlen(pszPassword) > 0) {
 		EncryptionAlgorithm::generateKeyFromPassword(pszPassword, key);
-		EncryptionAlgorithm::getSecondaryKey(key, key2);
 
 		data = (byte *)malloc(EncryptionAlgorithm::getEncryptedDataLength(this->_length) + DATA_HEADER_SIZE);
 
@@ -315,12 +312,6 @@ void Data::encrypt(char * pszPassword)
 
 		AES cipher(&this->_data[DATA_HEADER_SIZE], this->_length);
 		cipher.encrypt(key, &data[DATA_HEADER_SIZE]);
-
-		AES cipher2(&data[DATA_HEADER_SIZE], EncryptionAlgorithm::getEncryptedDataLength(this->_length));
-		cipher2.encrypt(key2, &data[DATA_HEADER_SIZE]);
-
-		XOR cipher3(&data[DATA_HEADER_SIZE], EncryptionAlgorithm::getEncryptedDataLength(this->_length));
-		cipher3.encrypt(XORkey, STATIC_KEY_LENGTH, &data[DATA_HEADER_SIZE]);
 
 		free(this->_data);
 
@@ -341,21 +332,13 @@ void Data::encrypt(byte * pbKey, dword ulKeyLength)
 
 void Data::decrypt(char * pszPassword)
 {
-	byte 	key[16];
-	byte	key2[16];
+	byte 	key[KEY_LENGTH];
 
 	/*
 	** Do not encrypt if no password supplied...
 	*/
 	if (pszPassword != NULL && strlen(pszPassword) > 0 && this->isEncrypted()) {
 		EncryptionAlgorithm::generateKeyFromPassword(pszPassword, key);
-		EncryptionAlgorithm::getSecondaryKey(key, key2);
-
-		XOR cipher3(&this->_data[DATA_HEADER_SIZE], this->_length);
-		cipher3.decrypt(XORkey, STATIC_KEY_LENGTH, &this->_data[DATA_HEADER_SIZE]);
-
-		AES cipher2(&this->_data[DATA_HEADER_SIZE], this->_length);
-		cipher2.decrypt(key2, &this->_data[DATA_HEADER_SIZE]);
 
 		AES cipher(&this->_data[DATA_HEADER_SIZE], this->_length);
 		cipher.decrypt(key, &this->_data[DATA_HEADER_SIZE]);
