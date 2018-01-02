@@ -10,6 +10,7 @@ Some hints regarding password strength
 A good password is one that cannot be broken using a dictionary attack, e.g. don't use a word from the dictionary or a derivation of. Use a made-up word or phrase with symbols and numbers, better stil a random string of characters. In the context of this software, an important aspect is getting the password to your intended audience securely.
 
 References:
+
 https://en.wikipedia.org/wiki/Dictionary_attack
 
 https://en.wikipedia.org/wiki/Password_strength
