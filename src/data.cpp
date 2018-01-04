@@ -298,6 +298,7 @@ BitStreamIterator * Data::iterator(word usBitsPerByte)
 void Data::encrypt(char * pszPassword)
 {
 	byte 	key[KEY_LENGTH];
+	byte	iv[IV_LENGTH];
 	byte *	data;
 
 	/*
@@ -305,13 +306,21 @@ void Data::encrypt(char * pszPassword)
 	*/
 	if (pszPassword != NULL && strlen(pszPassword) > 0) {
 		EncryptionAlgorithm::generateKeyFromPassword(pszPassword, key);
+		EncryptionAlgorithm::getSecondaryKey(pszPassword, iv);
 
 		data = (byte *)malloc(EncryptionAlgorithm::getEncryptedDataLength(this->_length) + DATA_HEADER_SIZE);
 
 		memcpy(data, this->_data, DATA_HEADER_SIZE);
 
-		AES cipher(&this->_data[DATA_HEADER_SIZE], this->_length);
-		cipher.encrypt(key, &data[DATA_HEADER_SIZE]);
+		AES256 cipher(
+					&this->_data[DATA_HEADER_SIZE],
+					EncryptionAlgorithm::getEncryptedDataLength(this->_length));
+
+		cipher.setKey(key, KEY_LENGTH);
+		cipher.setIv(iv, IV_LENGTH);
+		cipher.encrypt(
+				&data[DATA_HEADER_SIZE],
+				EncryptionAlgorithm::getEncryptedDataLength(this->_length));
 
 		free(this->_data);
 
@@ -326,22 +335,31 @@ void Data::encrypt(byte * pbKey, dword ulKeyLength)
 {
 	if (ulKeyLength > 0L) {
 		XOR cipher(&this->_data[DATA_HEADER_SIZE], this->_length);
-		cipher.encrypt(pbKey, ulKeyLength, &this->_data[DATA_HEADER_SIZE]);
+		cipher.encrypt(pbKey, ulKeyLength, &this->_data[DATA_HEADER_SIZE], this->_length);
 	}
 }
 
 void Data::decrypt(char * pszPassword)
 {
 	byte 	key[KEY_LENGTH];
+	byte	iv[IV_LENGTH];
 
 	/*
 	** Do not encrypt if no password supplied...
 	*/
 	if (pszPassword != NULL && strlen(pszPassword) > 0 && this->isEncrypted()) {
 		EncryptionAlgorithm::generateKeyFromPassword(pszPassword, key);
+		EncryptionAlgorithm::getSecondaryKey(pszPassword, iv);
 
-		AES cipher(&this->_data[DATA_HEADER_SIZE], this->_length);
-		cipher.decrypt(key, &this->_data[DATA_HEADER_SIZE]);
+		AES256 cipher(
+					&this->_data[DATA_HEADER_SIZE],
+					EncryptionAlgorithm::getEncryptedDataLength(this->_length));
+
+		cipher.setKey(key, KEY_LENGTH);
+		cipher.setIv(iv, IV_LENGTH);
+		cipher.decrypt(
+				&this->_data[DATA_HEADER_SIZE],
+				EncryptionAlgorithm::getEncryptedDataLength(this->_length));
 
 		this->setIsEncrypted(false);
 		this->_length = this->getCompressedLength();
@@ -352,7 +370,7 @@ void Data::decrypt(byte * pbKey, dword ulKeyLength)
 {
 	if (ulKeyLength > 0L) {
 		XOR cipher(&this->_data[DATA_HEADER_SIZE], this->_length);
-		cipher.decrypt(pbKey, ulKeyLength, &this->_data[DATA_HEADER_SIZE]);
+		cipher.decrypt(pbKey, ulKeyLength, &this->_data[DATA_HEADER_SIZE], this->_length);
 	}
 }
 
