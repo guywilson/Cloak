@@ -42,10 +42,10 @@ LFLAGS_REL=-lstdc++
 LFLAGS_DBG=-lstdc++ $(DBG)
 
 LFLAGS=$(LFLAGS_REL)
-LIBS=-lpng -lz -lbsd -lsph
+LIBS=-lpng -lz -lbsd -lgcrypt
 
 # Object files (in linker ',' seperated format)
-OBJFILES=$(BUILD)/main.o $(BUILD)/exception.o $(BUILD)/iterator.o $(BUILD)/image.o $(BUILD)/data.o $(BUILD)/encryption.o $(BUILD)/cloak.o $(BUILD)/pngreadwrite.o $(BUILD)/aes.o
+OBJFILES=$(BUILD)/main.o $(BUILD)/exception.o $(BUILD)/iterator.o $(BUILD)/image.o $(BUILD)/data.o $(BUILD)/encryption.o $(BUILD)/cloak.o $(BUILD)/pngreadwrite.o
 
 # Target
 all: $(TARGET)
@@ -72,9 +72,6 @@ $(BUILD)/cloak.o: $(SOURCE)/cloak.cpp $(SOURCE)/cloak.h $(SOURCE)/image.h $(SOUR
 
 $(BUILD)/main.o: $(SOURCE)/main.cpp $(SOURCE)/cloak.h $(SOURCE)/image.h $(SOURCE)/data.h $(SOURCE)/iterator.h $(SOURCE)/exception.h $(SOURCE)/errorcodes.h $(SOURCE)/types.h
 	$(CPP) $(CPPFLAGS) -o $(BUILD)/main.o $(SOURCE)/main.cpp
-
-$(BUILD)/aes.o: $(SOURCE)/aes.c $(SOURCE)/aes.h
-	$(C) $(CFLAGS) -o $(BUILD)/aes.o $(SOURCE)/aes.c
 
 $(BUILD)/pngreadwrite.o: $(SOURCE)/pngreadwrite.c $(SOURCE)/pngreadwrite.h $(SOURCE)/writepng.h
 	$(C) $(CFLAGS) -I/usr/local/include -o $(BUILD)/pngreadwrite.o $(SOURCE)/pngreadwrite.c

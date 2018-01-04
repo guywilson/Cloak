@@ -22,10 +22,10 @@ TARGET=cloak.exe
 DEPLOYLOC=C:\Users\guy\bin
 
 # libpng includes
-PNGH=.\pnglib
+PNGH=.\lib
 
-# libpng dependencies
-PNGLIB=.\pnglib\vcwin32
+# dependencies
+LIBS=.\lib\vcwin32
 
 # C++ compiler
 CPP=cl
@@ -53,7 +53,7 @@ LFLAGS_DBG=$(LFLAGS_REL) /DEBUG /ASSEMBLYDEBUG
 LFLAGS=$(LFLAGS_REL)
 
 # Object files (in linker ',' seperated format)
-OBJFILES=$(BUILD)\main.obj $(BUILD)\exception.obj $(BUILD)\iterator.obj $(BUILD)\image.obj $(BUILD)\data.obj $(BUILD)\encryption.obj $(BUILD)\cloak.obj $(BUILD)\pngreadwrite.obj $(BUILD)\aes.obj
+OBJFILES=$(BUILD)\main.obj $(BUILD)\exception.obj $(BUILD)\iterator.obj $(BUILD)\image.obj $(BUILD)\data.obj $(BUILD)\encryption.obj $(BUILD)\cloak.obj $(BUILD)\pngreadwrite.obj
 
 # Target
 all: $(TARGET) pngtopng.exe savepng.exe
@@ -81,9 +81,6 @@ $(BUILD)\cloak.obj: $(SOURCE)\cloak.cpp $(SOURCE)\cloak.h $(SOURCE)\image.h $(SO
 $(BUILD)\main.obj: $(SOURCE)\main.cpp $(SOURCE)\cloak.h $(SOURCE)\image.h $(SOURCE)\data.h $(SOURCE)\iterator.h $(SOURCE)\exception.h $(SOURCE)\errorcodes.h $(SOURCE)\types.h
 	$(CPP) $(CPPFLAGS) -Fd$(BUILD)\main.pdb -Fo$(BUILD)\main.obj $(SOURCE)\main.cpp
 
-$(BUILD)\aes.obj: $(SOURCE)\aes.c $(SOURCE)\aes.h
-	$(CPP) $(CFLAGS) -Fd$(BUILD)\aes.pdb -Fo$(BUILD)\aes.obj /Tc$(SOURCE)\aes.c
-
 $(BUILD)\pngtopng.obj: $(SOURCE)\pngtopng.c
 	$(CPP) $(CFLAGS) -Fd$(BUILD)\pngtopng.pdb -Fo$(BUILD)\pngtopng.obj /Tc$(SOURCE)\pngtopng.c
 
@@ -94,11 +91,11 @@ $(BUILD)\pngreadwrite.obj: $(SOURCE)\pngreadwrite.c $(SOURCE)\pngreadwrite.h $(S
 	$(CPP) $(CFLAGS) -Fd$(BUILD)\pngreadwrite.pdb -Fo$(BUILD)\pngreadwrite.obj /Tc$(SOURCE)\pngreadwrite.c
 
 $(TARGET): $(OBJFILES)
-	$(LINKER) $(LFLAGS) /MAP:out.map /PDB:out.pdb /OUT:$(TARGET) $(OBJFILES) /NODEFAULTLIB:libcmt msvcrt.lib $(PNGLIB)\libpng.lib $(PNGLIB)\zlib.lib $(PNGLIB)\libsph.lib
+	$(LINKER) $(LFLAGS) /MAP:out.map /PDB:out.pdb /OUT:$(TARGET) $(OBJFILES) /NODEFAULTLIB:libcmt msvcrt.lib $(LIBS)\libpng.lib $(LIBS)\zlib.lib $(LIBS)\libgcrypt.lib
 	copy $(TARGET) $(DEPLOYLOC)
 
 pngtopng.exe: $(BUILD)\pngtopng.obj
-	$(LINKER) $(LFLAGS_REL) /OUT:pngtopng.exe $(BUILD)\pngtopng.obj /NODEFAULTLIB:libcmt msvcrt.lib $(PNGLIB)\libpng.lib $(PNGLIB)\zlib.lib
+	$(LINKER) $(LFLAGS_REL) /OUT:pngtopng.exe $(BUILD)\pngtopng.obj /NODEFAULTLIB:libcmt msvcrt.lib $(LIBS)\libpng.lib $(LIBS)\zlib.lib
 
 savepng.exe: $(BUILD)\savepng.obj
-	$(LINKER) $(LFLAGS_REL) /OUT:savepng.exe $(BUILD)\savepng.obj /NODEFAULTLIB:libcmt msvcrt.lib $(PNGLIB)\libpng.lib $(PNGLIB)\zlib.lib
+	$(LINKER) $(LFLAGS_REL) /OUT:savepng.exe $(BUILD)\savepng.obj /NODEFAULTLIB:libcmt msvcrt.lib $(LIBS)\libpng.lib $(LIBS)\zlib.lib
