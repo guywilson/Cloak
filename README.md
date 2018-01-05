@@ -3,7 +3,7 @@ Hide and extract an encrypted file within an RGB (24-bit) bitmap or PNG image.
 
 The idea is simple, a 24-bit colour bitmap or PNG image uses 3 bytes for each pixel in the image, one each for Red, Green and Blue, so each colour channel is represented by a value between 0 - 255. If we encode a file in the least significant bits (LSBs) of the image data, there will be no visible difference in the image when displayed. At an encoding depth of 1-bit per byte, we need 8 bytes of image data to encode 1 byte of our file.
 
-Cloak compresses and then optionally encrypts your 'secret' data file using the AES-256 cipher prior to encoding it in your chosen image. You will be prompted to enter a password (max 32 chars), the SHA-256 hash of which is used as the key for the pass through AES. Cloak can also encrypt using a supplied keystream file using simple XOR encryption, the advantage of this mechanism is you can employ a one-time-pad scheme, which providing you stick to the rules for a one-time-pad encryption scheme, is mathematically proven to be unbreakable. Of course, any encryption scheme is useless if some third party has got hold of your encryption key.
+Cloak compresses and then optionally encrypts your 'secret' data file using the AES-256 cipher in CBC mode prior to encoding it in your chosen image. You will be prompted to enter a password (max 32 chars), the SHA-256 hash of which is used as the key for the pass through AES. Cloak can also encrypt using a supplied keystream file using simple XOR encryption, the advantage of this mechanism is you can employ a one-time-pad scheme, which providing you stick to the rules for a one-time-pad encryption scheme, is mathematically proven to be unbreakable. Of course, any encryption scheme is useless if some third party has got hold of your encryption key.
 
 Some hints regarding password strength
 --------------------------------------
@@ -12,8 +12,9 @@ A good password is one that cannot be broken using a dictionary attack, e.g. don
 References:
 
 https://en.wikipedia.org/wiki/Dictionary_attack
-
 https://en.wikipedia.org/wiki/Password_strength
+https://www.random.org/
+
 
 Building Cloak
 --------------
