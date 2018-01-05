@@ -57,7 +57,7 @@ PBYTE EncryptionAlgorithm::generateKeyFromPassword(PSZ pszPassword, PBYTE key)
 	if (pwdLength > KEY_LENGTH) {
 			throw new Exception(
 						ERR_INVALID_PWD_LEN,
-						"Invalid password length, must be < 64 characters",
+						"Invalid password length, must be < 32 characters",
 						__FILE__,
 						"EncryptionAlgorithm",
 						"generateKeyFromPassword()",
@@ -102,19 +102,22 @@ void EncryptionAlgorithm::getSecondaryKey(PSZ pszPassword, PBYTE pSecondaryKey)
 	gcry_cipher_hd_t	aes_hd;
 
 	/*
+	** Details of algorithm
+	** --------------------
 	** 1. Get a 128 bit (16 byte) hash of the password using MD5
-	** 2. Substitute each byte using the key table
-	** 3. Encrypt using AES-128, using the Blake-128 hash of the password as a key
-	** 4. Use this as the secondary key
+	** 2. Substitute each byte of the result using the key table
+	** 3. Get the Blake-128 hash of the password as an encryption key
+	** 4. Encrypt the key from step 2 using AES-128, using the Blake-128 hash from step 3
 	*/
-
 	pwdLen = strlen(pszPassword);
 
+	/*
+	** 1. Get a 128 bit (16 byte) hash of the password using MD5
+	*/
 	gcry_md_hash_buffer(GCRY_MD_MD5, md5key, pszPassword, pwdLen);
 
 	/*
-	** Use each byte of the new key as a lookup to the staticKey table
-	** defined in key.h
+	** 2. Substitute each byte of the result using the key table
 	*/
 	for (i = 0;i < 16;i++) {
 		b = md5key[i];
@@ -127,11 +130,20 @@ void EncryptionAlgorithm::getSecondaryKey(PSZ pszPassword, PBYTE pSecondaryKey)
 			bank = 0;
 		}
 
+		/*
+		** Use keyTable from key.h
+		*/
 		pSecondaryKey[i] = keyTable[keyIndex];
 	}
 
+	/*
+	** 3. Get the Blake-128 hash of the password as an encryption key
+	*/
 	gcry_md_hash_buffer(GCRY_MD_BLAKE2S_128, blakekey, pszPassword, pwdLen);
 
+	/*
+	** 4. Encrypt the key from step 2 using AES-128, using the Blake-128 hash from step 3
+	*/
     int err = gcry_cipher_open(
     					&aes_hd,
     					GCRY_CIPHER_AES128,
