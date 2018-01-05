@@ -22,10 +22,10 @@ TARGET=cloak.exe
 DEPLOYLOC=C:\Users\guy\bin
 
 # libpng includes
-PNGH=.\lib
+INCLUDES=.\includes
 
 # dependencies
-LIBS=.\lib\vcwin32
+LIBS=.\libs
 
 # C++ compiler
 CPP=cl
@@ -37,11 +37,11 @@ LINKER=link
 MACHINE=/MACHINE:x64
 
 # C++ compiler flags
-CFLAGS_REL=-c -W3 -Ot -Gs -nologo -I $(PNGH) -D_CRT_SECURE_NO_WARNINGS
-CFLAGS_DBG=-c -W3 -Ot -Gs -Zi -nologo -I $(PNGH) -D_CRT_SECURE_NO_WARNINGS -DDEBUG_MEMORY
+CFLAGS_REL=-c -W3 -Ot -Gs -nologo -I $(INCLUDES) -D_CRT_SECURE_NO_WARNINGS
+CFLAGS_DBG=-c -W3 -Ot -Gs -Zi -nologo -I $(INCLUDES) -D_CRT_SECURE_NO_WARNINGS -DDEBUG_MEMORY
 
-CPPFLAGS_REL=-c -W3 -Ot -Gs -EHsc -nologo -I $(PNGH) -D_CRT_SECURE_NO_WARNINGS
-CPPFLAGS_DBG=-c -W3 -Ot -Gs -EHsc -Zi -nologo -I $(PNGH) -D_CRT_SECURE_NO_WARNINGS -DDEBUG_MEMORY
+CPPFLAGS_REL=-c -W3 -Ot -Gs -EHsc -nologo -I $(INCLUDES) -D_CRT_SECURE_NO_WARNINGS
+CPPFLAGS_DBG=-c -W3 -Ot -Gs -EHsc -Zi -nologo -I $(INCLUDES) -D_CRT_SECURE_NO_WARNINGS -DDEBUG_MEMORY
 
 CFLAGS=$(CFLAGS_REL)
 CPPFLAGS=$(CPPFLAGS_REL)
