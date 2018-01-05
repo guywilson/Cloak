@@ -20,7 +20,7 @@ https://www.random.org/
 
 Building Cloak
 --------------
-Cloak is written in C++ and I have provided makefiles for Unix/Linux (makefile.nix.mak) using the gcc compiler (tested on Ubuntu 16.04 64-bit), for Windows (makefile.win.mak) using Visual Studio C++ (I used VS 2015 Community Edition, tested on Windows 10 64-bit), and for macOS (makefile.mac.mak) using gcc (xcode command line tools) and tested on macOS Sierra 10.12.6. Cloak depends on the 3rd party libraries libpng, zlib (both for PNG read/write functionality), libgcrypt (for the encryption and hashing algorithms) and libbsd for Ubuntu (to provide strlcpy/strlcat library functions).
+Cloak is written in C++ and I have provided makefiles for Unix/Linux (makefile.nix.mak) using the gcc compiler (tested on Ubuntu 16.04 64-bit), for Windows (makefile.win.mak) using Visual Studio C++ (I used VS 2015 Community Edition, tested on Windows 10 64-bit), and for macOS (makefile.mac.mak) using gcc (xcode command line tools) and tested on macOS Sierra 10.12.6. Cloak depends on the 3rd party libraries libpng, zlib (both for PNG read/write functionality), libgcrypt (for the encryption and hashing algorithms, part of GPG) and libbsd for Ubuntu (to provide strlcpy/strlcat library functions).
 
 It is recommended that you copy the system specific makefile.xxx.mak to the file 'makefile', e.g. on macOs
 
