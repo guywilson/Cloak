@@ -381,49 +381,55 @@ dword Data::compress(int level)
 	byte *			compressed;
 	int				rtn = 0;
 
-	ulSize = compressBound(this->_length);
+	if (level > 0) {
+		ulSize = compressBound(this->_length);
 
-	compressed = (byte *)malloc(ulSize + DATA_HEADER_SIZE);
+		compressed = (byte *)malloc(ulSize + DATA_HEADER_SIZE);
 
-	if (compressed == NULL) {
-		throw new Exception(
-			ERR_MALLOC,
-			"Failed to allocate memory for compressed data",
-			__FILE__,
-			"Data",
-			"compress()",
-			__LINE__);
+		if (compressed == NULL) {
+			throw new Exception(
+				ERR_MALLOC,
+				"Failed to allocate memory for compressed data",
+				__FILE__,
+				"Data",
+				"compress()",
+				__LINE__);
+		}
+
+		memcpy(compressed, this->_data, DATA_HEADER_SIZE);
+
+		rtn = compress2(
+					&compressed[DATA_HEADER_SIZE],
+					&ulSize,
+					&this->_data[DATA_HEADER_SIZE],
+					this->_length,
+					level);
+
+		if (rtn != Z_OK) {
+			throw new Exception(
+				ERR_MALLOC,
+				"Failed to compress data",
+				__FILE__,
+				"Data",
+				"compress()",
+				__LINE__);
+		}
+
+		free(this->_data);
+
+		this->_data = compressed;
+
+		compressedSize = (dword)ulSize;
+
+		this->setCompressedLength(compressedSize);
+		this->setIsCompressed(true);
+
+		this->_length = compressedSize;
 	}
-
-	memcpy(compressed, this->_data, DATA_HEADER_SIZE);
-
-	rtn = compress2(
-				&compressed[DATA_HEADER_SIZE],
-				&ulSize,
-				&this->_data[DATA_HEADER_SIZE],
-				this->_length,
-				level);
-
-	if (rtn != Z_OK) {
-		throw new Exception(
-			ERR_MALLOC,
-			"Failed to compress data",
-			__FILE__,
-			"Data",
-			"compress()",
-			__LINE__);
+	else {
+		compressedSize = this->_length;
+		this->setIsCompressed(false);
 	}
-
-	free(this->_data);
-
-	this->_data = compressed;
-
-	compressedSize = (dword)ulSize;
-
-	this->setCompressedLength(compressedSize);
-	this->setIsCompressed(true);
-
-	this->_length = compressedSize;
 
 	return compressedSize;
 }
@@ -434,45 +440,47 @@ void Data::decompress()
 	byte *			uncompressed;
 	int				rtn = 0;
 
-	uncompressedSize = this->getOriginalLength();
+	if (this->isCompressed()) {
+		uncompressedSize = this->getOriginalLength();
 
-	uncompressed = (byte *)malloc(uncompressedSize + DATA_HEADER_SIZE);
+		uncompressed = (byte *)malloc(uncompressedSize + DATA_HEADER_SIZE);
 
-	if (uncompressed == NULL) {
-		throw new Exception(
-			ERR_MALLOC,
-			"Failed to allocate memory for compressed data",
-			__FILE__,
-			"Data",
-			"decompress()",
-			__LINE__);
+		if (uncompressed == NULL) {
+			throw new Exception(
+				ERR_MALLOC,
+				"Failed to allocate memory for compressed data",
+				__FILE__,
+				"Data",
+				"decompress()",
+				__LINE__);
+		}
+
+		memcpy(uncompressed, this->_data, DATA_HEADER_SIZE);
+
+		rtn = uncompress(
+					&uncompressed[DATA_HEADER_SIZE],
+					&uncompressedSize,
+					&this->_data[DATA_HEADER_SIZE],
+					this->_length);
+
+		if (rtn != Z_OK) {
+			throw new Exception(
+				ERR_MALLOC,
+				"Failed to decompress data",
+				__FILE__,
+				"Data",
+				"decompress()",
+				__LINE__);
+		}
+
+		free(this->_data);
+
+		this->_data = uncompressed;
+
+		this->_length = uncompressedSize;
+
+		this->setIsCompressed(false);
 	}
-
-	memcpy(uncompressed, this->_data, DATA_HEADER_SIZE);
-
-	rtn = uncompress(
-				&uncompressed[DATA_HEADER_SIZE],
-				&uncompressedSize,
-				&this->_data[DATA_HEADER_SIZE],
-				this->_length);
-
-	if (rtn != Z_OK) {
-		throw new Exception(
-			ERR_MALLOC,
-			"Failed to compress data",
-			__FILE__,
-			"Data",
-			"decompress()",
-			__LINE__);
-	}
-
-	free(this->_data);
-
-	this->_data = uncompressed;
-
-	this->_length = uncompressedSize;
-
-	this->setIsCompressed(false);
 }
 
 
