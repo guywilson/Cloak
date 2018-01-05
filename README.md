@@ -3,10 +3,10 @@ Hide and extract an encrypted file within an RGB (24-bit) bitmap or PNG image.
 
 The idea is simple, a 24-bit colour bitmap or PNG image uses 3 bytes for each pixel in the image, one each for Red, Green and Blue, so each colour channel is represented by a value between 0 - 255. If we encode a file in the least significant bits (LSBs) of the image data, there will be no visible difference in the image when displayed. At an encoding depth of 1-bit per byte, we need 8 bytes of image data to encode 1 byte of our file.
 
-Cloak compresses and then optionally encrypts your 'secret' data file using the AES-256 cipher in CBC mode prior to encoding it in your chosen image. You will be prompted to enter a password (max 32 chars), the SHA-256 hash of which is used as the key for the pass through AES. Cloak can also encrypt using a supplied keystream file using simple XOR encryption, the advantage of this mechanism is you can employ a one-time-pad scheme, which providing you stick to the rules for a one-time-pad encryption scheme, is mathematically proven to be unbreakable. Of course, any encryption scheme is useless if some third party has got hold of your encryption key.
+Cloak optionally compresses and then optionally encrypts your 'secret' data file using the AES-256 cipher in CBC mode prior to encoding it in your chosen image. You will be prompted to enter a password (max 32 chars), the SHA-256 hash of which is used as the key for the pass through AES. Cloak can also encrypt using a supplied keystream file using simple XOR encryption, the advantage of this mechanism is you can employ a one-time-pad scheme, which providing you stick to the rules for a one-time-pad encryption scheme: 1) The key is truly random; 2) The key is used once and only once; 3) The key is at least as long as the file being encrypted, is mathematically proven to be unbreakable. Of course, any encryption scheme is useless if some third party has got hold of your encryption key.
 
-Some hints regarding password strength
---------------------------------------
+Some tips regarding password strength
+-------------------------------------
 A good password is one that cannot be broken using a dictionary attack, e.g. don't use a word from the dictionary or a derivation of. Use a made-up word or phrase with symbols and numbers, better stil a random string of characters. In the context of this software, an important aspect is getting the password to your intended audience securely.It is also imperative that you do not re-use a key, it may be prudent to agree a unique and random set of keys with your audience in advance.
 
 References:
@@ -46,7 +46,7 @@ Using Cloak
 -----------
 Cloak has two modes of operation, command line (driven by command line parameters) and interactive mode (you enter commands at the cloak> prompt). Type Cloak -? to get help on the command line parameters, if you just type Cloak [enter] you will enter interactive mode and can type the 'help' command for a list of available commands.
 
-I have included a sample PNG file with this distribution - flowers.png which has a PDF document encoded within it, the password used to encrypt the file is 'password', I strongly suggest you use much stronger passwords :)
+I have included a sample PNG file with this distribution - flowers.png which has a PDF document encoded within it, the password used to encrypt the file is 'password', you must use a strong password, see the tips above.
 
 For example, to 'cloak' a file within flowers.png I used the following command:
 
