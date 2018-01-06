@@ -51,6 +51,9 @@ PBYTE EncryptionAlgorithm::generateKeyFromPassword(PSZ pszPassword, PBYTE key)
 
 	pwdLength = (dword)strlen(pszPassword);
 
+	// Clear the buffer before we start...
+	memset(pwd, 0, KEY_LENGTH);
+
 	/*
 	** Validate password length...
 	*/
@@ -64,7 +67,7 @@ PBYTE EncryptionAlgorithm::generateKeyFromPassword(PSZ pszPassword, PBYTE key)
 						__LINE__);
 	}
 
-	for (i = 0;i < KEY_LENGTH;i++) {
+	for (i = 0;i < pwdLength;i++) {
 		pwd[i] = (byte)pszPassword[i];
 	}
 
