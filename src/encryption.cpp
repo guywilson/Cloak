@@ -96,10 +96,13 @@ void EncryptionAlgorithm::getSecondaryKey(PSZ pszPassword, PBYTE pSecondaryKey)
 	int					bank = 0;
 	int					keyIndex = 0;
 	int					pwdLen;
+	int					err;
 	byte				b;
-	byte				md5key[16];
-	byte				blakekey[16];
+	byte			*	md5key;
+	byte			*	blakekey;
 	gcry_cipher_hd_t	aes_hd;
+	gcry_md_hd_t		md5_hd;
+	gcry_md_hd_t		blake_hd;
 
 	/*
 	** Details of algorithm
@@ -114,7 +117,49 @@ void EncryptionAlgorithm::getSecondaryKey(PSZ pszPassword, PBYTE pSecondaryKey)
 	/*
 	** 1. Get a 128 bit (16 byte) hash of the password using MD5
 	*/
-	gcry_md_hash_buffer(GCRY_MD_MD5, md5key, pszPassword, pwdLen);
+	err = gcry_md_open(&md5_hd, 0, 0);
+
+	if (err) {
+		throw new Exception(
+					ERR_INVALID_STATE,
+					gcry_strerror(err),
+					__FILE__,
+					"EncryptionAlgorithm",
+					"getSecondaryKey()",
+					__LINE__);
+	}
+
+	err = gcry_md_enable(md5_hd, GCRY_MD_MD5);
+
+	if (err) {
+		throw new Exception(
+					ERR_INVALID_STATE,
+					gcry_strerror(err),
+					__FILE__,
+					"EncryptionAlgorithm",
+					"getSecondaryKey()",
+					__LINE__);
+	}
+
+	gcry_md_write(md5_hd, pszPassword, pwdLen);
+
+	err = gcry_md_final(md5_hd);
+
+	if (err) {
+		throw new Exception(
+					ERR_INVALID_STATE,
+					gcry_strerror(err),
+					__FILE__,
+					"EncryptionAlgorithm",
+					"getSecondaryKey()",
+					__LINE__);
+	}
+
+	md5key = gcry_md_read(md5_hd, GCRY_MD_MD5);
+
+	gcry_md_close(md5_hd);
+
+//	gcry_md_hash_buffer(GCRY_MD_MD5, md5key, pszPassword, pwdLen);
 
 	/*
 	** 2. Substitute each byte of the result using the key table
@@ -139,12 +184,54 @@ void EncryptionAlgorithm::getSecondaryKey(PSZ pszPassword, PBYTE pSecondaryKey)
 	/*
 	** 3. Get the Blake-128 hash of the password as an encryption key
 	*/
-	gcry_md_hash_buffer(GCRY_MD_BLAKE2S_128, blakekey, pszPassword, pwdLen);
+	err = gcry_md_open(&blake_hd, 0, 0);
+
+	if (err) {
+		throw new Exception(
+					ERR_INVALID_STATE,
+					gcry_strerror(err),
+					__FILE__,
+					"EncryptionAlgorithm",
+					"getSecondaryKey()",
+					__LINE__);
+	}
+
+	err = gcry_md_enable(blake_hd, GCRY_MD_BLAKE2S_128);
+
+	if (err) {
+		throw new Exception(
+					ERR_INVALID_STATE,
+					gcry_strerror(err),
+					__FILE__,
+					"EncryptionAlgorithm",
+					"getSecondaryKey()",
+					__LINE__);
+	}
+
+	gcry_md_write(blake_hd, pszPassword, pwdLen);
+
+	err = gcry_md_final(blake_hd);
+
+	if (err) {
+		throw new Exception(
+					ERR_INVALID_STATE,
+					gcry_strerror(err),
+					__FILE__,
+					"EncryptionAlgorithm",
+					"getSecondaryKey()",
+					__LINE__);
+	}
+
+	md5key = gcry_md_read(blake_hd, GCRY_MD_BLAKE2S_128);
+
+	gcry_md_close(blake_hd);
+
+//	gcry_md_hash_buffer(GCRY_MD_BLAKE2S_128, blakekey, pszPassword, pwdLen);
 
 	/*
 	** 4. Encrypt the key from step 2 using AES-128, using the Blake-128 hash from step 3
 	*/
-    int err = gcry_cipher_open(
+    err = gcry_cipher_open(
     					&aes_hd,
     					GCRY_CIPHER_AES128,
                         GCRY_CIPHER_MODE_ECB,
