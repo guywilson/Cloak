@@ -159,8 +159,6 @@ void EncryptionAlgorithm::getSecondaryKey(PSZ pszPassword, PBYTE pSecondaryKey)
 
 	gcry_md_close(md5_hd);
 
-//	gcry_md_hash_buffer(GCRY_MD_MD5, md5key, pszPassword, pwdLen);
-
 	/*
 	** 2. Substitute each byte of the result using the key table
 	*/
@@ -222,11 +220,9 @@ void EncryptionAlgorithm::getSecondaryKey(PSZ pszPassword, PBYTE pSecondaryKey)
 					__LINE__);
 	}
 
-	md5key = gcry_md_read(blake_hd, GCRY_MD_BLAKE2S_128);
+	blakekey = gcry_md_read(blake_hd, GCRY_MD_BLAKE2S_128);
 
 	gcry_md_close(blake_hd);
-
-//	gcry_md_hash_buffer(GCRY_MD_BLAKE2S_128, blakekey, pszPassword, pwdLen);
 
 	/*
 	** 4. Encrypt the key from step 2 using AES-128, using the Blake-128 hash from step 3
