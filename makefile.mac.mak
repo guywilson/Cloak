@@ -45,7 +45,7 @@ LFLAGS=$(LFLAGS_REL)
 LIBS=-lpng -lz -lgcrypt
 
 # Object files (in linker ',' seperated format)
-OBJFILES=$(BUILD)/main.o $(BUILD)/exception.o $(BUILD)/iterator.o $(BUILD)/image.o $(BUILD)/data.o $(BUILD)/encryption.o $(BUILD)/cloak.o $(BUILD)/pngreadwrite.o
+OBJFILES=$(BUILD)/main.o $(BUILD)/exception.o $(BUILD)/iterator.o $(BUILD)/image.o $(BUILD)/data.o $(BUILD)/encryption.o $(BUILD)/pwdmgr.o $(BUILD)/cloak.o $(BUILD)/pngreadwrite.o
 
 # Target
 all: $(TARGET)
@@ -66,6 +66,9 @@ $(BUILD)/data.o: $(SOURCE)/data.cpp $(SOURCE)/data.h $(SOURCE)/iterator.h $(SOUR
 
 $(BUILD)/encryption.o: $(SOURCE)/encryption.cpp $(SOURCE)/encryption.h $(SOURCE)/exception.h $(SOURCE)/errorcodes.h $(SOURCE)/types.h
 	$(CPP) $(CPPFLAGS) -o $(BUILD)/encryption.o $(SOURCE)/encryption.cpp
+
+$(BUILD)/pwdmgr.o: $(SOURCE)/pwdmgr.cpp $(SOURCE)/pwdmgr.h $(SOURCE)/encryption.h $(SOURCE)/exception.h $(SOURCE)/errorcodes.h $(SOURCE)/types.h
+	$(CPP) $(CPPFLAGS) -o $(BUILD)/pwdmgr.o $(SOURCE)/pwdmgr.cpp
 
 $(BUILD)/cloak.o: $(SOURCE)/cloak.cpp $(SOURCE)/cloak.h $(SOURCE)/image.h $(SOURCE)/data.h $(SOURCE)/iterator.h $(SOURCE)/exception.h $(SOURCE)/errorcodes.h $(SOURCE)/types.h
 	$(CPP) $(CPPFLAGS) -o $(BUILD)/cloak.o $(SOURCE)/cloak.cpp

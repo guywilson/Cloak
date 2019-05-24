@@ -35,8 +35,8 @@ class EncryptionAlgorithm
 						EncryptionAlgorithm(PBYTE pInputData, dword ulDataLength);
 						~EncryptionAlgorithm();
 
-		static PBYTE	generateKeyFromPassword(PSZ pszPassword, PBYTE key);
-		static void 	getSecondaryKey(PSZ pszPassword, PBYTE pSecondaryKey);
+		static PBYTE	generateKeyFromPassword(PSZ pszPassword, PBYTE key, int maxKeyLen);
+		static void 	getSecondaryKey(PSZ pszPassword, PBYTE pSecondaryKey, int keyLen);
 
 		dword			getEncryptedDataLength();
 		static dword	getEncryptedDataLength(dword ulDataLength);

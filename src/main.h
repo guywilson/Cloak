@@ -7,6 +7,7 @@
 #define		KEY_STREAM				0x10
 #define		KEY_DEBUG				0xFF
 
+#define MAX_PASSWORD_LENGTH			64
 #define PASSWORD_BUFFER_LENGTH		65
 
 void printUsage();
@@ -15,7 +16,7 @@ void processParams(int argc, char *argv[]);
 bool processCommand(Cloak * cloak, char *pszCommand);
 void getBitsPerByte(Cloak *cloak);
 void getCompressionLevel(Cloak *cloak);
-int getPassword(char *pszPassword, int maxLen);
+int getPassword();
 void getpwd(char *pszPassword, int maxLen);
 byte * getKeyStream(char *pszKeyFilename, dword * ulKeyLength);
 

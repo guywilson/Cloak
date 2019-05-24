@@ -43,7 +43,7 @@ dword EncryptionAlgorithm::getEncryptedDataLength(dword ulDataLength)
 	}
 }
 
-PBYTE EncryptionAlgorithm::generateKeyFromPassword(PSZ pszPassword, PBYTE key)
+PBYTE EncryptionAlgorithm::generateKeyFromPassword(PSZ pszPassword, PBYTE key, int maxKeyLen)
 {
 	dword				i;
 	dword				pwdLength;
@@ -53,6 +53,16 @@ PBYTE EncryptionAlgorithm::generateKeyFromPassword(PSZ pszPassword, PBYTE key)
 
 	// Clear the buffer before we start...
 	memset(pwd, 0, KEY_LENGTH);
+
+	if (maxKeyLen < KEY_LENGTH) {
+		throw new Exception(
+					ERR_INVALID_PWD_LEN,
+					"Invalid key length, must be 32 bytes",
+					__FILE__,
+					"EncryptionAlgorithm",
+					"generateKeyFromPassword()",
+					__LINE__);
+	}
 
 	/*
 	** Validate password length...
@@ -93,7 +103,7 @@ PBYTE EncryptionAlgorithm::generateKeyFromPassword(PSZ pszPassword, PBYTE key)
 	return key;
 }
 
-void EncryptionAlgorithm::getSecondaryKey(PSZ pszPassword, PBYTE pSecondaryKey)
+void EncryptionAlgorithm::getSecondaryKey(PSZ pszPassword, PBYTE pSecondaryKey, int keyLen)
 {
 	int					i;
 	int					bank = 0;
@@ -165,7 +175,7 @@ void EncryptionAlgorithm::getSecondaryKey(PSZ pszPassword, PBYTE pSecondaryKey)
 	/*
 	** 2. Substitute each byte of the result using the key table
 	*/
-	for (i = 0;i < 16;i++) {
+	for (i = 0;i < keyLen;i++) {
 		b = md5key[i];
 
 		keyIndex = (int)b + (256 * bank);

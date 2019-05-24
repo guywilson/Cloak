@@ -9,6 +9,7 @@
 #include "encryption.h"
 #include "exception.h"
 #include "errorcodes.h"
+#include "pwdmgr.h"
 
 using namespace std;
 
@@ -295,19 +296,16 @@ BitStreamIterator * Data::iterator(word usBitsPerByte)
 	return iterator;
 }
 
-void Data::encrypt(char * pszPassword)
+void Data::encrypt()
 {
-	byte 	key[KEY_LENGTH];
-	byte	iv[IV_LENGTH];
 	byte *	data;
+
+	PasswordManager & mgr = PasswordManager::getInstance();
 
 	/*
 	** Do not encrypt if no password supplied...
 	*/
-	if (pszPassword != NULL && strlen(pszPassword) > 0) {
-		EncryptionAlgorithm::generateKeyFromPassword(pszPassword, key);
-		EncryptionAlgorithm::getSecondaryKey(pszPassword, iv);
-
+	if (mgr.isPasswordSupplied()) {
 		data = (byte *)malloc(EncryptionAlgorithm::getEncryptedDataLength(this->_length) + DATA_HEADER_SIZE);
 
 		memcpy(data, this->_data, DATA_HEADER_SIZE);
@@ -316,8 +314,8 @@ void Data::encrypt(char * pszPassword)
 					&this->_data[DATA_HEADER_SIZE],
 					EncryptionAlgorithm::getEncryptedDataLength(this->_length));
 
-		cipher.setKey(key, KEY_LENGTH);
-		cipher.setIv(iv, IV_LENGTH);
+		cipher.setKey(mgr.getKey(), mgr.getKeyBufferLen());
+		cipher.setIv(mgr.getIV(), mgr.getIVBufferLen());
 		cipher.encrypt(
 				&data[DATA_HEADER_SIZE],
 				EncryptionAlgorithm::getEncryptedDataLength(this->_length));
@@ -339,24 +337,20 @@ void Data::encrypt(byte * pbKey, dword ulKeyLength)
 	}
 }
 
-void Data::decrypt(char * pszPassword)
+void Data::decrypt()
 {
-	byte 	key[KEY_LENGTH];
-	byte	iv[IV_LENGTH];
+	PasswordManager & mgr = PasswordManager::getInstance();
 
 	/*
-	** Do not encrypt if no password supplied...
+	** Do not decrypt if no password supplied...
 	*/
-	if (pszPassword != NULL && strlen(pszPassword) > 0 && this->isEncrypted()) {
-		EncryptionAlgorithm::generateKeyFromPassword(pszPassword, key);
-		EncryptionAlgorithm::getSecondaryKey(pszPassword, iv);
-
+	if (mgr.isPasswordSupplied()) {
 		AES256 cipher(
 					&this->_data[DATA_HEADER_SIZE],
 					EncryptionAlgorithm::getEncryptedDataLength(this->_length));
 
-		cipher.setKey(key, KEY_LENGTH);
-		cipher.setIv(iv, IV_LENGTH);
+		cipher.setKey(mgr.getKey(), mgr.getKeyBufferLen());
+		cipher.setIv(mgr.getIV(), mgr.getIVBufferLen());
 		cipher.decrypt(
 				&this->_data[DATA_HEADER_SIZE],
 				EncryptionAlgorithm::getEncryptedDataLength(this->_length));

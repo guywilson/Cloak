@@ -377,12 +377,12 @@ void Cloak::_extract()
 	free(pchSecretBuffer);
 }
 
-void Cloak::merge(char *pszFilename, char *pszPassword)
+void Cloak::merge(char *pszFilename)
 {
 	byte	*	pTargetBytes;
 
 	sourceData->compress(this->compressionLevel);
-	sourceData->encrypt(pszPassword);
+	sourceData->encrypt();
 
 	validate();
 
@@ -433,11 +433,11 @@ void Cloak::merge(char *pszFilename, byte *pbKeystream, dword ulKeyLength)
 	_merge(pTargetBytes);
 }
 
-void Cloak::extract(char *pszFilename, char *pszPassword)
+void Cloak::extract(char *pszFilename)
 {
 	_extract();
 
-	targetData->decrypt(pszPassword);
+	targetData->decrypt();
 	targetData->decompress();
 
 	DataFile outputFile(pszFilename, FILE_OPEN_WRITE | FILE_MODE_BINARY);

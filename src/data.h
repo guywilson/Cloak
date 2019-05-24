@@ -59,10 +59,10 @@ class Data
 
 		BitStreamIterator *	iterator(word usBitsPerByte);
 
-		void				encrypt(char * pszPassword);
+		void				encrypt();
 		void				encrypt(byte * pbKey, dword ulKeyLength);
 
-		void				decrypt(char * pszPassword);
+		void				decrypt();
 		void				decrypt(byte * pbKey, dword ulKeyLength);
 
 		dword				compress(int level);

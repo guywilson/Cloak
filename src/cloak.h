@@ -58,10 +58,10 @@ class Cloak
 
 		void				copy(char *pszFilename);
 
-		void				merge(char *pszFilename, char *pszPassword);
+		void				merge(char *pszFilename);
 		void				merge(char *pszFilename, byte *pbKeystream, dword ulKeyLength);
 
-		void				extract(char *pszFilename, char *pszPassword);
+		void				extract(char *pszFilename);
 		void				extract(char *pszFilename, byte *pbKeystream, dword ulKeyLength);
 
 		void				validate();

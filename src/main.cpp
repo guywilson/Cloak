@@ -36,6 +36,7 @@
 #include "cloak.h"
 #include "exception.h"
 #include "errorcodes.h"
+#include "pwdmgr.h"
 #include "main.h"
 
 using namespace std;
@@ -151,7 +152,6 @@ void processParams(int argc, char *argv[])
     char            szSecretFileName[FILENAME_BUFFER_LENGTH];
 	char			szKeyFileName[FILENAME_BUFFER_LENGTH];
 	int				keyMode = KEY_PASSWD;
-	char			szPassword[128];
     int             mode = MODE_INFO_ONLY;
     int				i;
     bool         	bPrintInfo = false;
@@ -159,6 +159,8 @@ void processParams(int argc, char *argv[])
 	int				compressionLevel = DEFAULT_COMPRESSION_LEVEL;
 	byte *			bKeyStream;
 	dword			ulKeyLength;
+
+	PasswordManager & mgr = PasswordManager::getInstance();
 
     for (i = 1;i < argc;i++) {
         if (argv[i][0] == '-' || argv[i][0] == '/') {
@@ -219,7 +221,10 @@ void processParams(int argc, char *argv[])
                 	// Debug mode, assume default password of 'password'...
                 	// Useful for when debugging with valgrind.
                 	keyMode = KEY_DEBUG;
-                	strcpy_s(szPassword, 128, "password");
+
+                	strcpy_s(mgr.getPasswordBuffer(), mgr.getPasswordBufferLen(), "password");
+
+                	mgr.finalise();
                 	break;
 
 				default:
@@ -237,7 +242,7 @@ void processParams(int argc, char *argv[])
 
 		if (keyMode == KEY_PASSWD) {
 			try {
-				if (getPassword(szPassword, 64) != 0) {
+				if (getPassword() != 0) {
 					return;
 				}
 			}
@@ -270,7 +275,7 @@ void processParams(int argc, char *argv[])
 			cloak->loadSourceDataFile(szSecretFileName);
 
 			if (keyMode == KEY_PASSWD) {
-				cloak->merge(szOutputFileName, szPassword);
+				cloak->merge(szOutputFileName);
 			}
 			else if (keyMode == KEY_STREAM) {
 				cloak->merge(szOutputFileName, bKeyStream, ulKeyLength);
@@ -292,7 +297,7 @@ void processParams(int argc, char *argv[])
 			}
 
 			if (keyMode == KEY_PASSWD) {
-				cloak->extract(szOutputFileName, szPassword);
+				cloak->extract(szOutputFileName);
 			}
 			else if (keyMode == KEY_STREAM) {
 				cloak->extract(szOutputFileName, bKeyStream, ulKeyLength);
@@ -331,7 +336,6 @@ bool processCommand(Cloak * cloak, char *pszCommand)
 	char			szImageFilename[FILENAME_BUFFER_LENGTH];
 	char			szSecretFilename[FILENAME_BUFFER_LENGTH];
 	char			szKeyFilename[FILENAME_BUFFER_LENGTH];
-	char			szPassword[PASSWORD_BUFFER_LENGTH];
 	byte *			pKeyStream;
 	dword			ulKeyLength;
 
@@ -499,11 +503,11 @@ bool processCommand(Cloak * cloak, char *pszCommand)
 			cin.getline(szKeyFilename, FILENAME_BUFFER_LENGTH);
 
 			if (strlen(szKeyFilename) == 0) {
-				if (getPassword(szPassword, PASSWORD_BUFFER_LENGTH - 1) != 0) {
+				if (getPassword() != 0) {
 					return false;
 				}
 
-				cloak->merge(szImageFilename, szPassword);
+				cloak->merge(szImageFilename);
 			}
 			else {
 				pKeyStream = getKeyStream(szKeyFilename, &ulKeyLength);
@@ -529,11 +533,11 @@ bool processCommand(Cloak * cloak, char *pszCommand)
 			cin.getline(szKeyFilename, FILENAME_BUFFER_LENGTH);
 
 			if (strlen(szKeyFilename) == 0) {
-				if (getPassword(szPassword, PASSWORD_BUFFER_LENGTH - 1) != 0) {
+				if (getPassword() != 0) {
 					return false;
 				}
 
-				cloak->extract(szSecretFilename, szPassword);
+				cloak->extract(szSecretFilename);
 			}
 			else {
 				pKeyStream = getKeyStream(szKeyFilename, &ulKeyLength);
@@ -630,12 +634,16 @@ void getCompressionLevel(Cloak *cloak)
 	}
 }
 
-int getPassword(char *pszPassword, int maxLen)
+int getPassword()
 {
+	PasswordManager & mgr = PasswordManager::getInstance();
+
 	cout << "Enter password: ";
 	cout.flush();
 
-	getpwd(pszPassword, maxLen);
+	getpwd(mgr.getPasswordBuffer(), mgr.getPasswordBufferLen());
+
+	mgr.finalise();
 
 	return 0;
 }
