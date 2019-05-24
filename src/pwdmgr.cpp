@@ -53,6 +53,8 @@ void PasswordManager::cleanUp()
 		this->wipePassword();
 
 		free(this->pszPassword);
+
+		this->pszPassword = nullptr;
 	}
 
 	this->wipeKeys();
@@ -94,13 +96,15 @@ void PasswordManager::finalise()
 	if (this->pszPassword != nullptr) {
 		if (strlen(this->pszPassword) > 0) {
 			this->passwordSupplied = true;
+
+			wipeKeys();
+
+			EncryptionAlgorithm::generateKeyFromPassword(this->pszPassword, this->getKey(), KEY_BUFFER_LEN);
+			EncryptionAlgorithm::getSecondaryKey(this->pszPassword, this->getIV(), IV_BUFFER_LEN);
 		}
 
-		wipeKeys();
-
-		EncryptionAlgorithm::generateKeyFromPassword(this->pszPassword, this->getKey(), KEY_BUFFER_LEN);
-		EncryptionAlgorithm::getSecondaryKey(this->pszPassword, this->getIV(), IV_BUFFER_LEN);
-
 		wipePassword();
+
+		free(this->pszPassword);
 	}
 }
