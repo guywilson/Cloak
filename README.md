@@ -1,3 +1,7 @@
+Please Note
+-----------
+Cloak has been superceded by clk, a newer, simpler and more secure version of Cloak...
+
 # Cloak
 Hide and extract an encrypted file within an RGB (24-bit) bitmap or PNG image. 
 
